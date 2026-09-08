@@ -4,7 +4,7 @@ import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { BonusDrawer } from './BonusDrawer';
 import { calculateBonusScore, createEmptyBonuses } from '../utils/scoring';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Crown, AlertTriangle, Gem, Swords, ArrowRight, ArrowLeft, Pencil, X, Trophy } from 'lucide-react';
+import { Crown, Gem, Swords, ArrowRight, ArrowLeft, Pencil, X, Trophy } from 'lucide-react';
 
 interface RoundEntryProps {
   gameState: GameState;
@@ -360,19 +360,18 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                {totalTricks !== cardCount && <AlertTriangle className="w-5 h-5 shrink-0" />}
                 <span className="font-bold text-sm sm:text-base leading-tight">
                   Total des plis réalisés :{' '}
                   <span className="font-mono text-base sm:text-lg font-black underline">{totalTricks}</span> / {cardCount}
                 </span>
               </div>
             </div>
-            <div className="mt-1 text-xs font-semibold pl-0 sm:pl-7">
+            <div className="mt-1 text-xs font-semibold">
               {totalTricks === cardCount
                 ? '✓ Compte exact'
                 : totalTricks < cardCount
-                ? `⚠️ Il manque ${cardCount - totalTricks} pli(s)`
-                : `⚠️ ${totalTricks - cardCount} pli(s) en trop`}
+                ? `❌ Il manque ${cardCount - totalTricks} pli(s)`
+                : `❌ ${totalTricks - cardCount} pli(s) en trop`}
             </div>
           </div>
 
