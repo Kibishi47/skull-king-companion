@@ -153,7 +153,7 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
             className="gap-1.5"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Corriger Dernière Manche</span>
+            <span>Annuler la manche</span>
           </ButtonPirate>
 
           <ButtonPirate
