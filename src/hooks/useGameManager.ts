@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { GameState, Player, GameSettings, PlayerRoundInput, Round, SavedGameItem } from '../types/game';
 import { useLocalStorage } from './useLocalStorage';
-import { calculatePlayerScore, createEmptyBonuses } from '../utils/scoring';
+import { calculatePlayerScore, createEmptyBonuses, recalculateGameScores } from '../utils/scoring';
 import { ROUND_PRESETS } from '../utils/presets';
 
 const STORAGE_KEYS = {
@@ -110,7 +110,7 @@ export function useGameManager() {
   }, [setActiveGame, setSavedPlayers, updateSavedGamesIndex]);
 
   /**
-   * Valider la saisie d'une manche complète
+   * Valider la saisie d'une manche (en cours ou rétroactive)
    */
   const submitRound = useCallback((roundInputs: PlayerRoundInput[]) => {
     if (!activeGame) return;
@@ -119,20 +119,18 @@ export function useGameManager() {
 
     const currentRound = activeGame.rounds[activeGame.currentRoundIndex];
     const cardCount = currentRound.cardCount;
-    const isLastRound = activeGame.currentRoundIndex >= activeGame.rounds.length - 1;
 
-    // Calcul des scores pour chaque joueur
+    // Calculer les scores préliminaires pour cette manche
+    // Noter que recalculateGameScores recalculera exactement les totaux cumulés
     const playerScores = roundInputs.map((input) => {
-      // Trouver le score cumulé précédent du joueur
       let previousCumulative = 0;
       if (activeGame.currentRoundIndex > 0) {
         const prevRound = activeGame.rounds[activeGame.currentRoundIndex - 1];
-        const prevScore = prevRound.playerScores.find(s => s.playerId === input.playerId);
+        const prevScore = prevRound.playerScores?.find((s) => s.playerId === input.playerId);
         if (prevScore) {
           previousCumulative = prevScore.cumulativeTotal;
         }
       }
-
       return calculatePlayerScore(input, cardCount, activeGame.settings.mode, previousCumulative);
     });
 
@@ -144,13 +142,31 @@ export function useGameManager() {
       lastInputs: roundInputs,
     };
 
-    const nextRoundIndex = activeGame.currentRoundIndex + 1;
-    const nextStatus = isLastRound ? 'completed' : 'recap';
+    // Recalcul en cascade de tous les totaux cumulés pour les manches suivantes
+    const fullyRecalculatedRounds = recalculateGameScores(updatedRounds, activeGame.settings.mode);
+
+    // Déterminer le prochain statut et index
+    // Trouver la première manche non terminée
+    const firstUncompletedIndex = fullyRecalculatedRounds.findIndex((r) => !r.isCompleted);
+    const allCompleted = firstUncompletedIndex === -1;
+
+    let nextRoundIndex: number;
+    let nextStatus: 'recap' | 'completed' | 'bidding';
+
+    if (allCompleted) {
+      nextRoundIndex = activeGame.rounds.length - 1;
+      nextStatus = 'completed';
+    } else {
+      // Si la manche qu'on vient de modifier n'est pas la dernière manche complétée,
+      // on peut soit afficher le récap de cette manche, soit revenir à la manche active en cours
+      nextRoundIndex = activeGame.currentRoundIndex + 1;
+      nextStatus = 'recap';
+    }
 
     const updatedGame: GameState = {
       ...activeGame,
-      rounds: updatedRounds,
-      currentRoundIndex: isLastRound ? activeGame.currentRoundIndex : nextRoundIndex,
+      rounds: fullyRecalculatedRounds,
+      currentRoundIndex: nextRoundIndex,
       status: nextStatus,
       updatedAt: Date.now(),
     };
@@ -158,8 +174,7 @@ export function useGameManager() {
     setActiveGame(updatedGame);
     updateSavedGamesIndex(updatedGame);
 
-    // Si la partie est terminée, l'archiver dans l'historique
-    if (isLastRound) {
+    if (allCompleted) {
       setGameHistory((prev) => [updatedGame, ...prev.slice(0, 29)]);
     }
   }, [activeGame, pushSnapshot, setActiveGame, setGameHistory, updateSavedGamesIndex]);
@@ -178,6 +193,37 @@ export function useGameManager() {
   }, [activeGame, pushSnapshot, setActiveGame]);
 
   /**
+   * Modifier la manche qui vient de se terminer (depuis le bilan de manche)
+   * Charge immédiatement l'état de la manche précédente sur l'écran 'tricks'
+   * en conservant 100% des données saisies (mises, plis, bonus).
+   */
+  const editRoundJustFinished = useCallback(() => {
+    if (!activeGame) return;
+    pushSnapshot(activeGame);
+    const targetIndex = Math.max(0, activeGame.currentRoundIndex - 1);
+    setActiveGame({
+      ...activeGame,
+      currentRoundIndex: targetIndex,
+      status: 'tricks',
+      updatedAt: Date.now(),
+    });
+  }, [activeGame, pushSnapshot, setActiveGame]);
+
+  /**
+   * Modifier une manche antérieure quelconque (édition rétroactive)
+   */
+  const editRoundAtIndex = useCallback((roundIndex: number) => {
+    if (!activeGame || roundIndex < 0 || roundIndex >= activeGame.rounds.length) return;
+    pushSnapshot(activeGame);
+    setActiveGame({
+      ...activeGame,
+      currentRoundIndex: roundIndex,
+      status: 'tricks',
+      updatedAt: Date.now(),
+    });
+  }, [activeGame, pushSnapshot, setActiveGame]);
+
+  /**
    * Annuler la dernière action (Undo) et revenir immédiatement à l'étape des plis
    */
   const undoLastAction = useCallback(() => {
@@ -187,10 +233,10 @@ export function useGameManager() {
       const lastSnapshot = historySnapshots[historySnapshots.length - 1];
       setHistorySnapshots((prev) => prev.slice(0, -1));
 
-      // S'assurer que si on revient d'un recap ou completed, on arrive sur 'tricks'
-      const targetRoundIndex = lastSnapshot.status === 'recap' || lastSnapshot.status === 'completed'
-        ? Math.max(0, lastSnapshot.currentRoundIndex - 1)
-        : lastSnapshot.currentRoundIndex;
+      const targetRoundIndex =
+        lastSnapshot.status === 'recap' || lastSnapshot.status === 'completed'
+          ? Math.max(0, lastSnapshot.currentRoundIndex - 1)
+          : lastSnapshot.currentRoundIndex;
 
       setActiveGame({
         ...lastSnapshot,
@@ -199,7 +245,6 @@ export function useGameManager() {
         updatedAt: Date.now(),
       });
     } else if (activeGame && (activeGame.status === 'recap' || activeGame.status === 'completed')) {
-      // Cas direct depuis recap sans snapshot supplémentaire
       const targetRoundIndex = Math.max(0, activeGame.currentRoundIndex - 1);
       setActiveGame({
         ...activeGame,
@@ -266,6 +311,8 @@ export function useGameManager() {
     proceedToNextRound,
     undoLastAction,
     editCurrentRound,
+    editRoundJustFinished,
+    editRoundAtIndex,
     resetGame,
     loadGame,
     deleteSavedGame,

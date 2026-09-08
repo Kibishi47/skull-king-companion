@@ -192,3 +192,49 @@ export function createEmptyBonuses(): BonusCounts {
     rascalBet: 0,
   };
 }
+
+/**
+ * Recalcule en cascade tous les scores et totaux cumulés d'une liste de manches
+ */
+export function recalculateGameScores(rounds: import('../types/game').Round[], mode: GameMode): import('../types/game').Round[] {
+  // Garder la trace des totaux cumulés par joueur
+  const cumulativeTotals: Record<string, number> = {};
+
+  return rounds.map((round) => {
+    if (!round.isCompleted) {
+      return round;
+    }
+
+    // Si on a les lastInputs, recalculer précisément à partir des inputs complets
+    if (round.lastInputs && round.lastInputs.length > 0) {
+      const playerScores = round.lastInputs.map((input) => {
+        const prevCumulative = cumulativeTotals[input.playerId] || 0;
+        const score = calculatePlayerScore(input, round.cardCount, mode, prevCumulative);
+        cumulativeTotals[input.playerId] = score.cumulativeTotal;
+        return score;
+      });
+
+      return {
+        ...round,
+        playerScores,
+      };
+    }
+
+    // Sinon recalculer à partir des playerScores existants
+    const playerScores = round.playerScores.map((score) => {
+      const prevCumulative = cumulativeTotals[score.playerId] || 0;
+      const newCumulative = prevCumulative + score.roundTotal;
+      cumulativeTotals[score.playerId] = newCumulative;
+      return {
+        ...score,
+        cumulativeTotal: newCumulative,
+      };
+    });
+
+    return {
+      ...round,
+      playerScores,
+    };
+  });
+}
+

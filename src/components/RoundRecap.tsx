@@ -2,21 +2,19 @@ import React from 'react';
 import { GameState } from '../types/game';
 import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
-import { ArrowRight, RotateCcw, CheckCircle2, XCircle, Trophy } from 'lucide-react';
+import { ArrowRight, Pencil, CheckCircle2, XCircle, Trophy } from 'lucide-react';
 
 interface RoundRecapProps {
   gameState: GameState;
   onProceed: () => void;
-  onUndo: () => void;
-  canUndo: boolean;
+  onEditRound: () => void;
   onOpenScoreboard: () => void;
 }
 
 export const RoundRecap: React.FC<RoundRecapProps> = ({
   gameState,
   onProceed,
-  onUndo,
-  canUndo,
+  onEditRound,
   onOpenScoreboard,
 }) => {
   // Manche venant de se terminer
@@ -121,18 +119,17 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
         </button>
       </div>
 
-      {/* Barre d'actions : Undo et Prochaine manche */}
+      {/* Barre d'actions : Modifier la manche et Prochaine manche */}
       <div className="grid grid-cols-2 gap-3 w-full max-w-md mx-auto pt-2 box-border">
         <ButtonPirate
           type="button"
-          onClick={onUndo}
-          disabled={!canUndo}
+          onClick={onEditRound}
           variant="ghost"
           size="md"
           className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
         >
-          <RotateCcw className="w-4 h-4 shrink-0" />
-          <span className="truncate">Annuler manche</span>
+          <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
+          <span className="truncate">Modifier la manche</span>
         </ButtonPirate>
 
         <ButtonPirate
