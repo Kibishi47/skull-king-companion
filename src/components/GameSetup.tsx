@@ -9,12 +9,14 @@ import { PlayerPickerModal } from './PlayerPickerModal';
 interface GameSetupProps {
   onStartGame: (players: string[], settings: GameSettings) => void;
   savedPlayers: string[];
+  onDeleteSavedPlayer?: (name: string) => void;
   initialSettings: GameSettings;
 }
 
 export const GameSetup: React.FC<GameSetupProps> = ({
   onStartGame,
   savedPlayers,
+  onDeleteSavedPlayer,
   initialSettings,
 }) => {
   // Initialisation avec 3 champs vierges
@@ -231,6 +233,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           onClose={() => setIsPickerOpen(false)}
           currentAssignedPlayers={playerInputs}
           savedPlayers={savedPlayers}
+          onDeleteSavedPlayer={onDeleteSavedPlayer}
           onAddSelectedPlayers={(namesToAdd) => {
             // Remplir d'abord les champs vides existants, puis ajouter les restants
             const updated = [...playerInputs];

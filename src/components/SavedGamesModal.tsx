@@ -24,8 +24,11 @@ export const SavedGamesModal: React.FC<SavedGamesModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-3 sm:p-4">
-      <div className="w-full max-w-lg bg-parchment-light rounded-2xl border-4 border-gold-dark shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-fade-in">
+      <div
+        className="w-full max-w-lg bg-parchment-light rounded-t-2xl sm:rounded-2xl border-t-4 sm:border-2 border-gold-dark shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between bg-parchment border-b-2 border-parchment-deep p-4">
           <div className="flex items-center gap-3">
@@ -162,13 +165,6 @@ export const SavedGamesModal: React.FC<SavedGamesModalProps> = ({
               );
             })
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 bg-parchment border-t border-parchment-deep flex justify-end">
-          <ButtonPirate onClick={onClose} variant="ghost" size="sm" className="whitespace-nowrap">
-            Fermer
-          </ButtonPirate>
         </div>
       </div>
     </div>

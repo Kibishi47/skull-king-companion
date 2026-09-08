@@ -29,6 +29,7 @@ export function App() {
     resetGame,
     loadGame,
     deleteSavedGame,
+    deleteSavedPlayer,
   } = useGameManager();
 
   const [isScoreboardOpen, setIsScoreboardOpen] = useState(false);
@@ -79,6 +80,7 @@ export function App() {
           <GameSetup
             onStartGame={startNewGame}
             savedPlayers={savedPlayers}
+            onDeleteSavedPlayer={deleteSavedPlayer}
             initialSettings={settings}
           />
         )}
@@ -148,8 +150,11 @@ export function App() {
 
       {/* Modale de confirmation Quitter la partie */}
       {showQuitConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-          <div className="bg-parchment-light max-w-sm w-full rounded-2xl border-4 border-gold-dark p-5 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-fade-in">
+          <div
+            className="bg-parchment-light max-w-sm w-full rounded-t-2xl sm:rounded-2xl border-t-4 sm:border-2 border-gold-dark p-5 space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3 border-b border-parchment-shadow pb-3">
               <div className="p-2 rounded-full bg-wax-light/20 text-wax">
                 <AlertCircle className="w-6 h-6" />

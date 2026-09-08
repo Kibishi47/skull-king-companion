@@ -78,8 +78,11 @@ export const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
   const sortedLeaderboard = [...playerStats].sort((a, b) => b.totalScore - a.totalScore);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-2 sm:p-4">
-      <div className="w-full max-w-4xl bg-parchment-light rounded-2xl border-4 border-gold-dark shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-fade-in">
+      <div
+        className="w-full max-w-4xl bg-parchment-light rounded-t-2xl sm:rounded-2xl border-t-4 sm:border-2 border-gold-dark shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header de la Modale */}
         <div className="flex items-center justify-between bg-parchment border-b-2 border-parchment-deep p-3.5 sm:p-4">
           <div className="flex items-center gap-3">
@@ -335,13 +338,6 @@ export const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
               </table>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 bg-parchment border-t border-parchment-deep flex justify-end">
-          <ButtonPirate onClick={onClose} variant="wood" size="sm" className="whitespace-nowrap">
-            Fermer
-          </ButtonPirate>
         </div>
       </div>
     </div>

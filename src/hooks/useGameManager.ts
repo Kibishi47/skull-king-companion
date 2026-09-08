@@ -343,12 +343,20 @@ export function useGameManager() {
     }
   }, [activeGame, setActiveGame, setSavedGames]);
 
+  /**
+   * Supprimer un joueur de la liste des joueurs récents
+   */
+  const deleteSavedPlayer = useCallback((name: string) => {
+    setSavedPlayers((prev) => prev.filter((p) => p !== name));
+  }, [setSavedPlayers]);
+
   return {
     activeGame,
     gameHistory,
     savedGames,
     savedPlayers,
     setSavedPlayers,
+    deleteSavedPlayer,
     settings,
     setSettings,
     canUndo: historySnapshots.length > 0,
