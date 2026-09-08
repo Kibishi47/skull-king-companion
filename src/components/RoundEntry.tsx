@@ -201,27 +201,6 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                 {cardCount} {cardCount > 1 ? 'cartes' : 'carte'}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-ink-light mt-0.5">
-              <button
-                type="button"
-                onClick={() => setStep('bidding')}
-                className={`font-semibold hover:underline ${
-                  step === 'bidding' ? 'text-wax font-extrabold underline' : ''
-                }`}
-              >
-                1. Mises
-              </button>
-              <span>•</span>
-              <button
-                type="button"
-                onClick={() => setStep('tricks')}
-                className={`font-semibold hover:underline ${
-                  step === 'tricks' ? 'text-wax font-extrabold underline' : ''
-                }`}
-              >
-                2. Plis & Bonus
-              </button>
-            </div>
           </div>
         </div>
 
@@ -318,16 +297,48 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             })}
           </div>
 
-          <ButtonPirate
-            type="button"
-            onClick={() => setStep('tricks')}
-            variant="wax"
-            size="lg"
-            className="w-full gap-2 shadow-xl whitespace-nowrap"
-          >
-            <span>Passer aux plis</span>
-            <ArrowRight className="w-5 h-5" />
-          </ButtonPirate>
+          {/* Boutons d'action de l'étape des mises */}
+          {isEditing ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
+              <ButtonPirate
+                type="button"
+                onClick={() => setStep('tricks')}
+                variant="ghost"
+                size="md"
+                className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
+              >
+                <span className="truncate">Passer aux plis</span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
+              </ButtonPirate>
+
+              <ButtonPirate
+                type="button"
+                onClick={handleFinishRound}
+                disabled={totalTricks !== cardCount}
+                variant="wax"
+                size="lg"
+                className="sm:col-span-2 w-full min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold truncate"
+              >
+                <Swords className="w-5 h-5 shrink-0" />
+                <span className="truncate">
+                  {totalTricks === cardCount
+                    ? 'Enregistrer les modifications'
+                    : `Plis requis : ${totalTricks} / ${cardCount}`}
+                </span>
+              </ButtonPirate>
+            </div>
+          ) : (
+            <ButtonPirate
+              type="button"
+              onClick={() => setStep('tricks')}
+              variant="wax"
+              size="lg"
+              className="w-full gap-2 shadow-xl whitespace-nowrap"
+            >
+              <span>Passer aux plis</span>
+              <ArrowRight className="w-5 h-5" />
+            </ButtonPirate>
+          )}
         </div>
       )}
 
