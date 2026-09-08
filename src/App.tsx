@@ -21,8 +21,11 @@ export function App() {
     submitRound,
     proceedToNextRound,
     undoLastAction,
+    editingRoundIndex,
+    startEditingRound,
+    cancelEditingRound,
+    saveEditedRound,
     editRoundJustFinished,
-    editRoundAtIndex,
     resetGame,
     loadGame,
     deleteSavedGame,
@@ -80,7 +83,20 @@ export function App() {
           />
         )}
 
-        {activeGame && (activeGame.status === 'bidding' || activeGame.status === 'tricks') && (
+        {/* Mode d'édition dédié pour modifier une manche antérieure ou venant de se terminer */}
+        {activeGame && editingRoundIndex !== null && (
+          <RoundEntry
+            gameState={activeGame}
+            roundIndex={editingRoundIndex}
+            isEditing={true}
+            onCancelEdit={cancelEditingRound}
+            onSubmitRound={(inputs) => saveEditedRound(editingRoundIndex, inputs)}
+            onOpenScoreboard={() => setIsScoreboardOpen(true)}
+          />
+        )}
+
+        {/* Déroulement standard de la partie */}
+        {activeGame && editingRoundIndex === null && (activeGame.status === 'bidding' || activeGame.status === 'tricks') && (
           <RoundEntry
             gameState={activeGame}
             onSubmitRound={submitRound}
@@ -88,7 +104,7 @@ export function App() {
           />
         )}
 
-        {activeGame && activeGame.status === 'recap' && (
+        {activeGame && editingRoundIndex === null && activeGame.status === 'recap' && (
           <RoundRecap
             gameState={activeGame}
             onProceed={proceedToNextRound}
@@ -97,7 +113,7 @@ export function App() {
           />
         )}
 
-        {activeGame && activeGame.status === 'completed' && (
+        {activeGame && editingRoundIndex === null && activeGame.status === 'completed' && (
           <GameOverPodium
             gameState={activeGame}
             onNewGame={resetGame}
@@ -114,7 +130,7 @@ export function App() {
           isOpen={isScoreboardOpen}
           onClose={() => setIsScoreboardOpen(false)}
           gameState={activeGame}
-          onEditRound={(roundIdx) => editRoundAtIndex(roundIdx)}
+          onEditRound={(roundIdx) => startEditingRound(roundIdx)}
         />
       )}
 
