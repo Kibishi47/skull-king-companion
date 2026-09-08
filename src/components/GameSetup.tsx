@@ -307,10 +307,10 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           onClick={handleStart}
           variant="wax"
           size="lg"
-          className="w-full shadow-xl gap-2 tracking-wider"
+          className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap"
         >
           <Swords className="w-5 h-5" />
-          <span>Hisser le Pavillon (Démarrer)</span>
+          <span>Démarrer la partie</span>
         </ButtonPirate>
       </div>
     </div>

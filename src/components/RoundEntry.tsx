@@ -231,9 +231,9 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             onClick={() => setStep('tricks')}
             variant="wax"
             size="lg"
-            className="w-full gap-2 shadow-xl"
+            className="w-full gap-2 shadow-xl whitespace-nowrap"
           >
-            <span>Passer à la Bataille (Plis)</span>
+            <span>Saisir les plis</span>
             <ArrowRight className="w-5 h-5" />
           </ButtonPirate>
         </div>
@@ -339,10 +339,10 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               onClick={() => setStep('bidding')}
               variant="ghost"
               size="md"
-              className="gap-1.5"
+              className="gap-1.5 whitespace-nowrap"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Corriger Mises</span>
+              <span>Corriger mises</span>
             </ButtonPirate>
 
             <ButtonPirate
@@ -351,11 +351,11 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               disabled={totalTricks !== cardCount}
               variant="wax"
               size="lg"
-              className="flex-1 gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Swords className="w-5 h-5" />
               <span>
-                {totalTricks === cardCount ? 'Valider la Manche' : `Plis incorrects (${totalTricks}/${cardCount})`}
+                {totalTricks === cardCount ? 'Valider la manche' : `Plis requis : ${totalTricks} / ${cardCount}`}
               </span>
             </ButtonPirate>
           </div>

@@ -47,7 +47,7 @@ export const ButtonPirate: React.FC<ButtonPirateProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'relative inline-flex items-center justify-center font-display font-bold tracking-wide rounded-lg select-none transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none';
+    'relative inline-flex items-center justify-center font-display font-bold tracking-wide rounded-lg select-none whitespace-nowrap transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none';
 
   const sizeStyles = {
     sm: 'text-xs px-3 py-1.5 min-h-[36px]',

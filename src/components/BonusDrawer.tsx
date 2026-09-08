@@ -215,13 +215,13 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
             <button
               type="button"
               onClick={() => updateBonus('lootAlliance', !bonuses.lootAlliance)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-sm transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${
                 bonuses.lootAlliance
                   ? 'bg-gold text-ink-pure shadow-sm'
                   : 'bg-parchment-dark text-ink-light'
               }`}
             >
-              {bonuses.lootAlliance ? 'ACTIF (+20)' : 'NON'}
+              {bonuses.lootAlliance ? 'ACTIF +20' : 'NON'}
             </button>
           </div>
 

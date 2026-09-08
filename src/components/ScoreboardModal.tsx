@@ -182,8 +182,8 @@ export const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
 
         {/* Footer */}
         <div className="p-3 bg-parchment border-t border-parchment-deep flex justify-end">
-          <ButtonPirate onClick={onClose} variant="wood" size="sm">
-            Fermer le Carnet
+          <ButtonPirate onClick={onClose} variant="wood" size="sm" className="whitespace-nowrap">
+            Fermer
           </ButtonPirate>
         </div>
       </div>

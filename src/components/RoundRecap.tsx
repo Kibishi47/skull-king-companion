@@ -129,10 +129,10 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
           disabled={!canUndo}
           variant="ghost"
           size="md"
-          className="gap-1.5"
+          className="gap-1.5 whitespace-nowrap"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>Annuler la manche</span>
+          <span>Annuler manche</span>
         </ButtonPirate>
 
         <ButtonPirate
@@ -140,9 +140,9 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
           onClick={onProceed}
           variant="wax"
           size="lg"
-          className="flex-1 gap-2 shadow-xl"
+          className="flex-1 gap-2 shadow-xl whitespace-nowrap"
         >
-          <span>Manche Suivante</span>
+          <span>Manche suivante</span>
           <ArrowRight className="w-5 h-5" />
         </ButtonPirate>
       </div>

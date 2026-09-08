@@ -137,10 +137,10 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
           onClick={onOpenScoreboard}
           variant="wood"
           size="md"
-          className="w-full gap-2"
+          className="w-full gap-2 whitespace-nowrap"
         >
           <Trophy className="w-4 h-4" />
-          <span>Examiner la Grille Complète</span>
+          <span>Grille de score</span>
         </ButtonPirate>
 
         <div className="flex gap-2">
@@ -150,10 +150,10 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
             disabled={!canUndo}
             variant="ghost"
             size="md"
-            className="gap-1.5"
+            className="gap-1.5 whitespace-nowrap"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Annuler la manche</span>
+            <span>Annuler manche</span>
           </ButtonPirate>
 
           <ButtonPirate
@@ -161,10 +161,10 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
             onClick={onNewGame}
             variant="wax"
             size="lg"
-            className="flex-1 gap-2 shadow-xl"
+            className="flex-1 gap-2 shadow-xl whitespace-nowrap"
           >
             <Swords className="w-5 h-5" />
-            <span>Nouvelle Traversée</span>
+            <span>Nouvelle partie</span>
           </ButtonPirate>
         </div>
       </div>
