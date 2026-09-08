@@ -44,6 +44,7 @@ export interface Round {
   dealerPlayerId: string;
   playerScores: PlayerRoundScore[];
   isCompleted: boolean;
+  lastInputs?: PlayerRoundInput[];
 }
 
 export interface RoundPreset {

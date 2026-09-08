@@ -16,22 +16,35 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   savedPlayers,
   initialSettings,
 }) => {
-  const [players, setPlayers] = useState<string[]>(['Jack', 'Barbe Noire', 'Anne Bonny', 'Mary Read']);
-  const [newPlayerName, setNewPlayerName] = useState('');
+  // Initialisation avec 3 champs vierges
+  const [playerInputs, setPlayerInputs] = useState<string[]>(['', '', '']);
   const [settings, setSettings] = useState<GameSettings>(initialSettings);
   const [customRounds, setCustomRounds] = useState<number[]>([1, 2, 3, 4, 5]);
 
-  const handleAddPlayer = (name: string) => {
-    const trimmed = name.trim();
-    if (!trimmed || players.includes(trimmed)) return;
-    if (players.length >= 8) return;
-    setPlayers([...players, trimmed]);
-    setNewPlayerName('');
+  const handlePlayerInputChange = (index: number, value: string) => {
+    const updated = [...playerInputs];
+    updated[index] = value;
+    setPlayerInputs(updated);
   };
 
-  const handleRemovePlayer = (index: number) => {
-    if (players.length <= 2) return; // 2 joueurs minimum
-    setPlayers(players.filter((_, i) => i !== index));
+  const handleAddPlayerField = (name: string = '') => {
+    if (playerInputs.length >= 8) return;
+    setPlayerInputs([...playerInputs, name]);
+  };
+
+  const handleRemovePlayerField = (index: number) => {
+    if (playerInputs.length <= 2) return; // 2 joueurs minimum
+    setPlayerInputs(playerInputs.filter((_, i) => i !== index));
+  };
+
+  const handleSelectRecentPlayer = (name: string) => {
+    // Si un champ est vide, on l'y met, sinon on ajoute un champ s'il reste de la place
+    const emptyIndex = playerInputs.findIndex((p) => !p.trim());
+    if (emptyIndex !== -1) {
+      handlePlayerInputChange(emptyIndex, name);
+    } else if (playerInputs.length < 8) {
+      handleAddPlayerField(name);
+    }
   };
 
   const handlePresetSelect = (preset: RoundPreset) => {
@@ -58,11 +71,14 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   };
 
   const handleStart = () => {
+    // Résolution des noms : nom saisi ou fallback "Joueur X" sobre
+    const finalPlayerNames = playerInputs.map((p, idx) => p.trim() || `Joueur ${idx + 1}`);
+
     const finalSettings: GameSettings = {
       ...settings,
       customCardCounts: settings.presetId === 'custom' ? customRounds : undefined,
     };
-    onStartGame(players, finalSettings);
+    onStartGame(finalPlayerNames, finalSettings);
   };
 
   return (
@@ -80,37 +96,37 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         </p>
       </div>
 
-      {/* Sélection des Équipages (Joueurs) */}
+      {/* Sélection des Joueurs */}
       <ParchmentCard variant="light" className="space-y-4">
         <div className="flex items-center justify-between border-b border-parchment-shadow pb-2">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-gold-deep" />
-            <h2 className="font-pirate text-lg sm:text-xl text-ink">Équipage ({players.length}/8)</h2>
+            <h2 className="font-pirate text-lg sm:text-xl text-ink">Joueurs ({playerInputs.length}/8)</h2>
           </div>
-          <span className="text-xs text-ink-faded font-sans">2 à 8 pirates</span>
+          <span className="text-xs text-ink-faded font-sans">2 à 8 joueurs</span>
         </div>
 
-        {/* Liste des joueurs actuels */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {players.map((player, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between bg-parchment px-3 py-2 rounded-lg border border-parchment-deep shadow-sm"
-            >
-              <div className="flex items-center gap-2 overflow-hidden">
-                <span className="w-6 h-6 rounded-full bg-pirate-wood text-gold text-xs flex items-center justify-center font-bold">
-                  {idx + 1}
-                </span>
-                <span className="font-semibold text-ink truncate text-sm sm:text-base">
-                  {player}
-                </span>
-              </div>
-              {players.length > 2 && (
+        {/* Liste des champs de saisie pour chaque joueur */}
+        <div className="space-y-2.5">
+          {playerInputs.map((name, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-pirate-wood text-gold text-xs flex items-center justify-center font-bold shrink-0">
+                {idx + 1}
+              </span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => handlePlayerInputChange(idx, e.target.value)}
+                placeholder={`Joueur ${idx + 1}`}
+                maxLength={20}
+                className="flex-1 bg-white/90 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
+              />
+              {playerInputs.length > 2 && (
                 <button
                   type="button"
-                  onClick={() => handleRemovePlayer(idx)}
-                  className="text-wax hover:text-wax-dark p-1 rounded transition-colors"
-                  aria-label={`Supprimer ${player}`}
+                  onClick={() => handleRemovePlayerField(idx)}
+                  className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors"
+                  aria-label={`Supprimer le joueur ${idx + 1}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -119,44 +135,34 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           ))}
         </div>
 
-        {/* Formulaire d'ajout de joueur */}
-        {players.length < 8 && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleAddPlayer(newPlayerName);
-            }}
-            className="flex gap-2 pt-1"
-          >
-            <input
-              type="text"
-              value={newPlayerName}
-              onChange={(e) => setNewPlayerName(e.target.value)}
-              placeholder="Nom du pirate..."
-              maxLength={20}
-              className="flex-1 bg-white/80 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
-            />
-            <ButtonPirate type="submit" variant="wood" size="sm" className="gap-1">
-              <Plus className="w-4 h-4" />
-              <span>Enrôler</span>
-            </ButtonPirate>
-          </form>
+        {/* Bouton pour ajouter un joueur */}
+        {playerInputs.length < 8 && (
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => handleAddPlayerField('')}
+              className="w-full py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5"
+            >
+              <Plus className="w-4 h-4 text-gold-deep" />
+              <span>Ajouter un joueur</span>
+            </button>
+          </div>
         )}
 
-        {/* Raccourcis de pirates enregistrés */}
-        {savedPlayers.filter(p => !players.includes(p)).length > 0 && (
-          <div className="pt-2">
-            <p className="text-xs text-ink-faded mb-1.5 font-display">Taverne des vétérans :</p>
+        {/* Joueurs récents / favoris */}
+        {savedPlayers.filter(p => !playerInputs.includes(p)).length > 0 && (
+          <div className="pt-2 border-t border-parchment-deep">
+            <p className="text-xs text-ink-faded mb-2 font-display">Joueurs récents :</p>
             <div className="flex flex-wrap gap-1.5">
               {savedPlayers
-                .filter((p) => !players.includes(p))
-                .slice(0, 6)
+                .filter((p) => !playerInputs.includes(p))
+                .slice(0, 10)
                 .map((name, i) => (
                   <button
                     key={i}
                     type="button"
-                    onClick={() => handleAddPlayer(name)}
-                    className="text-xs bg-parchment-dark/60 hover:bg-parchment-deep text-ink px-2.5 py-1 rounded-md border border-parchment-shadow transition-colors"
+                    onClick={() => handleSelectRecentPlayer(name)}
+                    className="text-xs bg-parchment hover:bg-parchment-deep text-ink px-2.5 py-1 rounded-md border border-parchment-shadow transition-colors"
                   >
                     + {name}
                   </button>

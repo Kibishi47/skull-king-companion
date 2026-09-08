@@ -20,9 +20,7 @@ const DEFAULT_SETTINGS: GameSettings = {
 export function useGameManager() {
   const [activeGame, setActiveGame] = useLocalStorage<GameState | null>(STORAGE_KEYS.ACTIVE_GAME, null);
   const [gameHistory, setGameHistory] = useLocalStorage<GameState[]>(STORAGE_KEYS.HISTORY, []);
-  const [savedPlayers, setSavedPlayers] = useLocalStorage<string[]>(STORAGE_KEYS.SAVED_PLAYERS, [
-    'Jack', 'Barbe Noire', 'Anne Bonny', 'Mary Read'
-  ]);
+  const [savedPlayers, setSavedPlayers] = useLocalStorage<string[]>(STORAGE_KEYS.SAVED_PLAYERS, []);
   const [settings, setSettings] = useLocalStorage<GameSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
 
   // Pile d'historique (snapshots) pour Undo/Redo au sein de la partie active
@@ -108,6 +106,7 @@ export function useGameManager() {
       ...currentRound,
       playerScores,
       isCompleted: true,
+      lastInputs: roundInputs,
     };
 
     const nextRoundIndex = activeGame.currentRoundIndex + 1;
@@ -143,14 +142,37 @@ export function useGameManager() {
   }, [activeGame, pushSnapshot, setActiveGame]);
 
   /**
-   * Annuler la dernière action (Undo)
+   * Annuler la dernière action (Undo) et revenir immédiatement à l'étape des plis
    */
   const undoLastAction = useCallback(() => {
-    if (historySnapshots.length === 0) return;
-    const lastSnapshot = historySnapshots[historySnapshots.length - 1];
-    setHistorySnapshots((prev) => prev.slice(0, -1));
-    setActiveGame(lastSnapshot);
-  }, [historySnapshots, setActiveGame]);
+    if (historySnapshots.length === 0 && !activeGame) return;
+
+    if (historySnapshots.length > 0) {
+      const lastSnapshot = historySnapshots[historySnapshots.length - 1];
+      setHistorySnapshots((prev) => prev.slice(0, -1));
+
+      // S'assurer que si on revient d'un recap ou completed, on arrive sur 'tricks'
+      const targetRoundIndex = lastSnapshot.status === 'recap' || lastSnapshot.status === 'completed'
+        ? Math.max(0, lastSnapshot.currentRoundIndex - 1)
+        : lastSnapshot.currentRoundIndex;
+
+      setActiveGame({
+        ...lastSnapshot,
+        currentRoundIndex: targetRoundIndex,
+        status: 'tricks',
+        updatedAt: Date.now(),
+      });
+    } else if (activeGame && (activeGame.status === 'recap' || activeGame.status === 'completed')) {
+      // Cas direct depuis recap sans snapshot supplémentaire
+      const targetRoundIndex = Math.max(0, activeGame.currentRoundIndex - 1);
+      setActiveGame({
+        ...activeGame,
+        currentRoundIndex: targetRoundIndex,
+        status: 'tricks',
+        updatedAt: Date.now(),
+      });
+    }
+  }, [historySnapshots, activeGame, setActiveGame]);
 
   /**
    * Recommencer une nouvelle manche / Modifier la manche en cours
