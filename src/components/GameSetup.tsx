@@ -3,23 +3,19 @@ import { GameSettings, RoundPreset } from '../types/game';
 import { ROUND_PRESETS } from '../utils/presets';
 import { ButtonPirate, ParchmentCard } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles, Search, FolderOpen } from 'lucide-react';
+import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles, Search } from 'lucide-react';
 import { PlayerPickerModal } from './PlayerPickerModal';
 
 interface GameSetupProps {
   onStartGame: (players: string[], settings: GameSettings) => void;
   savedPlayers: string[];
   initialSettings: GameSettings;
-  savedGamesCount?: number;
-  onOpenSavedGames?: () => void;
 }
 
 export const GameSetup: React.FC<GameSetupProps> = ({
   onStartGame,
   savedPlayers,
   initialSettings,
-  savedGamesCount = 0,
-  onOpenSavedGames,
 }) => {
   // Initialisation avec 3 champs vierges
   const [playerInputs, setPlayerInputs] = useState<string[]>(['', '', '']);
@@ -90,22 +86,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         <p className="text-ink-faded font-display text-sm tracking-widest uppercase mt-1">
           Carnet de bord & Tenue de score
         </p>
-
-        {/* Bouton Charger une partie sur l'écran d'accueil - uniquement s'il y a des parties */}
-        {onOpenSavedGames && savedGamesCount > 0 && (
-          <div className="pt-3">
-            <ButtonPirate
-              type="button"
-              onClick={onOpenSavedGames}
-              variant="wood"
-              size="sm"
-              className="gap-2 whitespace-nowrap shadow-sm"
-            >
-              <FolderOpen className="w-4 h-4 text-gold" />
-              <span>Charger une partie</span>
-            </ButtonPirate>
-          </div>
-        )}
       </div>
 
       {/* Sélection des Joueurs */}

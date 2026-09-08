@@ -75,8 +75,6 @@ export function App() {
             onStartGame={startNewGame}
             savedPlayers={savedPlayers}
             initialSettings={settings}
-            savedGamesCount={savedGames.length}
-            onOpenSavedGames={() => setIsSavedGamesModalOpen(true)}
           />
         )}
 
