@@ -25,7 +25,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   const [playerInputs, setPlayerInputs] = useState<string[]>(['', '', '']);
   const [settings, setSettings] = useState<GameSettings>(initialSettings);
   const [customRounds, setCustomRounds] = useState<number[]>([1, 2, 3, 4, 5]);
-  const [pickerTargetIndex, setPickerTargetIndex] = useState<number | null>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const handlePlayerInputChange = (index: number, value: string) => {
     const updated = [...playerInputs];
@@ -91,8 +91,8 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           Carnet de bord & Tenue de score
         </p>
 
-        {/* Bouton Charger une partie sur l'écran d'accueil */}
-        {onOpenSavedGames && (
+        {/* Bouton Charger une partie sur l'écran d'accueil - uniquement s'il y a des parties */}
+        {onOpenSavedGames && savedGamesCount > 0 && (
           <div className="pt-3">
             <ButtonPirate
               type="button"
@@ -115,10 +115,21 @@ export const GameSetup: React.FC<GameSetupProps> = ({
             <Users className="w-5 h-5 text-gold-deep" />
             <h2 className="font-pirate text-lg sm:text-xl text-ink">Joueurs ({playerInputs.length}/8)</h2>
           </div>
-          <span className="text-xs text-ink-faded font-sans">2 à 8 joueurs</span>
+
+          {/* Bouton général pour charger/ajouter des joueurs récents en un clic */}
+          {savedPlayers.length > 0 && playerInputs.length < 8 && (
+            <button
+              type="button"
+              onClick={() => setIsPickerOpen(true)}
+              className="flex items-center gap-1.5 text-xs font-display font-bold text-gold-deep bg-parchment border border-parchment-shadow px-2.5 py-1 rounded-md hover:bg-parchment-deep transition-colors whitespace-nowrap"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Joueurs récents</span>
+            </button>
+          )}
         </div>
 
-        {/* Liste des champs de saisie pour chaque joueur avec bouton de recherche */}
+        {/* Liste des champs de saisie pour chaque joueur */}
         <div className="space-y-2.5">
           {playerInputs.map((name, idx) => (
             <div key={idx} className="flex items-center gap-1.5">
@@ -135,19 +146,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                 className="flex-1 bg-white/90 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
               />
 
-              {/* Bouton de recherche/sélection parmi les profils enregistrés */}
-              {savedPlayers.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setPickerTargetIndex(idx)}
-                  title="Sélectionner un joueur existant"
-                  aria-label={`Sélectionner un joueur pour l'emplacement ${idx + 1}`}
-                  className="p-2.5 rounded-lg bg-parchment border border-parchment-shadow text-gold-deep hover:bg-parchment-dark transition-colors shrink-0"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              )}
-
               {playerInputs.length > 2 && (
                 <button
                   type="button"
@@ -162,31 +160,55 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           ))}
         </div>
 
-        {/* Bouton pour ajouter un joueur */}
-        {playerInputs.length < 8 && (
-          <div className="pt-1">
+        {/* Actions sous la liste des joueurs */}
+        <div className="flex gap-2 pt-1">
+          {playerInputs.length < 8 && (
             <button
               type="button"
               onClick={() => handleAddPlayerField('')}
-              className="w-full py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="flex-1 py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 text-gold-deep" />
               <span>Ajouter un joueur</span>
             </button>
-          </div>
-        )}
+          )}
+
+          {savedPlayers.length > 0 && playerInputs.length < 8 && (
+            <button
+              type="button"
+              onClick={() => setIsPickerOpen(true)}
+              className="py-2 px-3 bg-parchment border border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment-deep transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+            >
+              <FolderOpen className="w-4 h-4 text-gold-deep" />
+              <span>Récents</span>
+            </button>
+          )}
+        </div>
       </ParchmentCard>
 
-      {/* Modale de sélection de profil joueur */}
-      {pickerTargetIndex !== null && (
+      {/* Modale de sélection multiple de joueurs récents */}
+      {isPickerOpen && (
         <PlayerPickerModal
-          isOpen={pickerTargetIndex !== null}
-          onClose={() => setPickerTargetIndex(null)}
-          targetIndex={pickerTargetIndex}
+          isOpen={isPickerOpen}
+          onClose={() => setIsPickerOpen(false)}
           currentAssignedPlayers={playerInputs}
           savedPlayers={savedPlayers}
-          onSelectPlayer={(index, selectedName) => {
-            handlePlayerInputChange(index, selectedName);
+          onAddSelectedPlayers={(namesToAdd) => {
+            // Remplir d'abord les champs vides existants, puis ajouter les restants
+            const updated = [...playerInputs];
+            const remainingToAdd = [...namesToAdd];
+
+            for (let i = 0; i < updated.length; i++) {
+              if (!updated[i].trim() && remainingToAdd.length > 0) {
+                updated[i] = remainingToAdd.shift()!;
+              }
+            }
+
+            while (remainingToAdd.length > 0 && updated.length < 8) {
+              updated.push(remainingToAdd.shift()!);
+            }
+
+            setPlayerInputs(updated);
           }}
         />
       )}
