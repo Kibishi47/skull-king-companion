@@ -115,18 +115,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
             <Users className="w-5 h-5 text-gold-deep" />
             <h2 className="font-pirate text-lg sm:text-xl text-ink">Joueurs ({playerInputs.length}/8)</h2>
           </div>
-
-          {/* Bouton général pour charger/ajouter des joueurs récents en un clic */}
-          {savedPlayers.length > 0 && playerInputs.length < 8 && (
-            <button
-              type="button"
-              onClick={() => setIsPickerOpen(true)}
-              className="flex items-center gap-1.5 text-xs font-display font-bold text-gold-deep bg-parchment border border-parchment-shadow px-2.5 py-1 rounded-md hover:bg-parchment-deep transition-colors whitespace-nowrap"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Joueurs récents</span>
-            </button>
-          )}
+          <span className="text-xs text-ink-faded font-sans">2 à 8 joueurs</span>
         </div>
 
         {/* Liste des champs de saisie pour chaque joueur */}
@@ -179,8 +168,8 @@ export const GameSetup: React.FC<GameSetupProps> = ({
               onClick={() => setIsPickerOpen(true)}
               className="py-2 px-3 bg-parchment border border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment-deep transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
             >
-              <FolderOpen className="w-4 h-4 text-gold-deep" />
-              <span>Récents</span>
+              <Users className="w-4 h-4 text-gold-deep" />
+              <span>Joueurs récents</span>
             </button>
           )}
         </div>
