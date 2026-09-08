@@ -13,12 +13,10 @@
   }
 
   html, body {
-    @apply bg-parchment-dark text-ink antialiased select-none overflow-x-hidden;
+    @apply bg-parchment-dark text-ink antialiased select-none;
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
-    overscroll-behavior-y: none;
   }
 
   /* Prevent iOS Safari zooming on inputs */
