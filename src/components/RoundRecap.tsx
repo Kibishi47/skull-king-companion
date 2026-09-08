@@ -107,43 +107,42 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
         })}
       </div>
 
-      {/* Bouton vers la grille de score */}
-      <div className="w-full max-w-md mx-auto">
+      {/* Actions et Raccourcis */}
+      <div className="space-y-3 pt-2 w-full max-w-md mx-auto box-border">
         <ButtonPirate
           type="button"
           onClick={onOpenScoreboard}
           variant="wood"
           size="md"
-          className="w-full gap-2 shadow-md whitespace-nowrap text-xs sm:text-sm"
+          className="w-full gap-2 shadow-md whitespace-nowrap text-xs sm:text-sm py-3"
         >
           <Trophy className="w-4 h-4 text-gold shrink-0" />
-          <span className="truncate">Tableau des scores</span>
-        </ButtonPirate>
-      </div>
-
-      {/* Barre d'actions : Modifier la manche et Prochaine manche */}
-      <div className="flex flex-col sm:flex-row gap-2.5 w-full max-w-md mx-auto pt-2 box-border">
-        <ButtonPirate
-          type="button"
-          onClick={onEditRound}
-          variant="ghost"
-          size="md"
-          className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
-        >
-          <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
-          <span>Modifier la manche</span>
+          <span>Tableau des scores</span>
         </ButtonPirate>
 
-        <ButtonPirate
-          type="button"
-          onClick={onProceed}
-          variant="wax"
-          size="lg"
-          className="flex-1 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
-        >
-          <span>Manche suivante</span>
-          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-        </ButtonPirate>
+        <div className="flex flex-col sm:flex-row gap-2.5 w-full box-border">
+          <ButtonPirate
+            type="button"
+            onClick={onEditRound}
+            variant="ghost"
+            size="md"
+            className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
+          >
+            <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
+            <span>Modifier la manche</span>
+          </ButtonPirate>
+
+          <ButtonPirate
+            type="button"
+            onClick={onProceed}
+            variant="wax"
+            size="lg"
+            className="flex-1 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
+          >
+            <span>Manche suivante</span>
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+          </ButtonPirate>
+        </div>
       </div>
     </div>
   );
