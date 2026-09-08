@@ -3,7 +3,7 @@ import { GameSettings, RoundPreset } from '../types/game';
 import { ROUND_PRESETS } from '../utils/presets';
 import { ButtonPirate, ParchmentCard } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles, Search } from 'lucide-react';
+import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles, Search, ChevronUp, ChevronDown } from 'lucide-react';
 import { PlayerPickerModal } from './PlayerPickerModal';
 
 interface GameSetupProps {
@@ -37,6 +37,24 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   const handleRemovePlayerField = (index: number) => {
     if (playerInputs.length <= 2) return; // 2 joueurs minimum
     setPlayerInputs(playerInputs.filter((_, i) => i !== index));
+  };
+
+  const handleMovePlayerUp = (index: number) => {
+    if (index <= 0) return;
+    const updated = [...playerInputs];
+    const temp = updated[index - 1];
+    updated[index - 1] = updated[index];
+    updated[index] = temp;
+    setPlayerInputs(updated);
+  };
+
+  const handleMovePlayerDown = (index: number) => {
+    if (index >= playerInputs.length - 1) return;
+    const updated = [...playerInputs];
+    const temp = updated[index + 1];
+    updated[index + 1] = updated[index];
+    updated[index] = temp;
+    setPlayerInputs(updated);
   };
 
   const handlePresetSelect = (preset: RoundPreset) => {
@@ -114,6 +132,29 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                 maxLength={20}
                 className="flex-1 bg-white/90 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
               />
+
+              <div className="flex flex-col gap-0.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleMovePlayerUp(idx)}
+                  disabled={idx === 0}
+                  className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                  aria-label={`Monter le joueur ${idx + 1}`}
+                  title="Monter"
+                >
+                  <ChevronUp className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMovePlayerDown(idx)}
+                  disabled={idx === playerInputs.length - 1}
+                  className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                  aria-label={`Descendre le joueur ${idx + 1}`}
+                  title="Descendre"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
               {playerInputs.length > 2 && (
                 <button
