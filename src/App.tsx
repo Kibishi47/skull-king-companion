@@ -5,14 +5,15 @@ import { RoundEntry } from './components/RoundEntry';
 import { RoundRecap } from './components/RoundRecap';
 import { GameOverPodium } from './components/GameOverPodium';
 import { ScoreboardModal } from './components/ScoreboardModal';
+import { SavedGamesModal } from './components/SavedGamesModal';
 import { SkullKingLogo } from './components/SkullKingLogo';
-import { Trophy, History, Home, AlertCircle } from 'lucide-react';
+import { Trophy, Home, AlertCircle, FolderOpen } from 'lucide-react';
 import { ButtonPirate } from './components/ParchmentUI';
 
 export function App() {
   const {
     activeGame,
-    gameHistory,
+    savedGames,
     savedPlayers,
     settings,
     canUndo,
@@ -21,10 +22,12 @@ export function App() {
     proceedToNextRound,
     undoLastAction,
     resetGame,
+    loadGame,
+    deleteSavedGame,
   } = useGameManager();
 
   const [isScoreboardOpen, setIsScoreboardOpen] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [isSavedGamesModalOpen, setIsSavedGamesModalOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   return (
@@ -46,19 +49,19 @@ export function App() {
                 onClick={() => setShowQuitConfirm(true)}
                 title="Quitter la partie"
                 aria-label="Quitter / Menu principal"
-                className="flex items-center gap-1.5 text-xs font-display font-bold px-3 py-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink hover:bg-parchment transition-colors"
+                className="flex items-center gap-1.5 text-xs font-display font-bold px-3 py-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink hover:bg-parchment whitespace-nowrap transition-colors"
               >
                 <Home className="w-4 h-4 text-wax" />
                 <span className="hidden sm:inline">Menu</span>
               </button>
-            ) : gameHistory.length > 0 ? (
+            ) : savedGames.length > 0 ? (
               <button
                 type="button"
-                onClick={() => setShowHistoryModal(true)}
-                className="flex items-center gap-1.5 text-xs font-display font-bold px-3 py-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink hover:bg-parchment transition-colors"
+                onClick={() => setIsSavedGamesModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs font-display font-bold px-3 py-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink hover:bg-parchment whitespace-nowrap transition-colors"
               >
-                <History className="w-4 h-4 text-gold-deep" />
-                <span>Archives ({gameHistory.length})</span>
+                <FolderOpen className="w-4 h-4 text-gold-deep" />
+                <span>Parties</span>
               </button>
             ) : null}
           </div>
@@ -72,6 +75,8 @@ export function App() {
             onStartGame={startNewGame}
             savedPlayers={savedPlayers}
             initialSettings={settings}
+            savedGamesCount={savedGames.length}
+            onOpenSavedGames={() => setIsSavedGamesModalOpen(true)}
           />
         )}
 
@@ -113,56 +118,18 @@ export function App() {
         />
       )}
 
-      {/* Modal d'historique des anciennes parties */}
-      {showHistoryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-parchment-light max-w-lg w-full rounded-xl border-2 border-gold-dark p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-parchment-shadow pb-2">
-              <h3 className="font-pirate text-xl text-ink font-bold">Archives des Traversées</h3>
-              <button
-                type="button"
-                onClick={() => setShowHistoryModal(false)}
-                className="text-ink-faded font-bold text-lg"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              {gameHistory.map((game, i) => {
-                const winner = game.rounds[game.rounds.length - 1]?.playerScores.slice().sort(
-                  (a, b) => b.cumulativeTotal - a.cumulativeTotal
-                )[0];
-                const winnerName = game.players.find((p) => p.id === winner?.playerId)?.name;
-
-                return (
-                  <div
-                    key={game.id || i}
-                    className="p-3 bg-parchment border border-parchment-deep rounded-lg flex justify-between items-center text-xs sm:text-sm"
-                  >
-                    <div>
-                      <span className="font-display font-bold text-ink block">
-                        Partie du {new Date(game.createdAt).toLocaleDateString('fr-FR')}
-                      </span>
-                      <span className="text-ink-light">
-                        {game.players.length} pirates • {game.settings.mode.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-gold-deep font-bold block">
-                        👑 {winnerName || 'Inconnu'}
-                      </span>
-                      <span className="font-mono font-bold text-ink-pure">
-                        {winner?.cumulativeTotal || 0} pts
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal des parties sauvegardées */}
+      <SavedGamesModal
+        isOpen={isSavedGamesModalOpen}
+        onClose={() => setIsSavedGamesModalOpen(false)}
+        savedGames={savedGames}
+        onLoadGame={(game) => {
+          loadGame(game);
+        }}
+        onDeleteGame={(id) => {
+          deleteSavedGame(id);
+        }}
+      />
 
       {/* Modale de confirmation Quitter la partie */}
       {showQuitConfirm && (

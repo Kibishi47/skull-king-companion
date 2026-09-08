@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { GameState, Player, GameSettings, PlayerRoundInput, Round } from '../types/game';
+import { GameState, Player, GameSettings, PlayerRoundInput, Round, SavedGameItem } from '../types/game';
 import { useLocalStorage } from './useLocalStorage';
 import { calculatePlayerScore, createEmptyBonuses } from '../utils/scoring';
 import { ROUND_PRESETS } from '../utils/presets';
@@ -7,6 +7,7 @@ import { ROUND_PRESETS } from '../utils/presets';
 const STORAGE_KEYS = {
   ACTIVE_GAME: 'skullking_active_game',
   HISTORY: 'skullking_history',
+  SAVED_GAMES: 'skullking_saved_games',
   SAVED_PLAYERS: 'skullking_saved_players',
   SETTINGS: 'skullking_settings',
 };
@@ -17,9 +18,34 @@ const DEFAULT_SETTINGS: GameSettings = {
   presetId: 'standard',
 };
 
+function createSavedGameItem(game: GameState): SavedGameItem {
+  const completedRounds = game.rounds.filter((r) => r.isCompleted);
+  const lastCompletedRound = completedRounds[completedRounds.length - 1];
+
+  const playersSummary = game.players.map((p) => {
+    let score = 0;
+    if (lastCompletedRound) {
+      const scoreObj = lastCompletedRound.playerScores.find((s) => s.playerId === p.id);
+      if (scoreObj) score = scoreObj.cumulativeTotal;
+    }
+    return { name: p.name, score };
+  });
+
+  return {
+    id: game.id,
+    date: game.updatedAt || game.createdAt,
+    players: playersSummary,
+    currentRound: Math.min(game.rounds.length, game.currentRoundIndex + 1),
+    totalRounds: game.rounds.length,
+    isFinished: game.status === 'completed',
+    gameSnapshot: game,
+  };
+}
+
 export function useGameManager() {
   const [activeGame, setActiveGame] = useLocalStorage<GameState | null>(STORAGE_KEYS.ACTIVE_GAME, null);
   const [gameHistory, setGameHistory] = useLocalStorage<GameState[]>(STORAGE_KEYS.HISTORY, []);
+  const [savedGames, setSavedGames] = useLocalStorage<SavedGameItem[]>(STORAGE_KEYS.SAVED_GAMES, []);
   const [savedPlayers, setSavedPlayers] = useLocalStorage<string[]>(STORAGE_KEYS.SAVED_PLAYERS, []);
   const [settings, setSettings] = useLocalStorage<GameSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
 
@@ -29,6 +55,14 @@ export function useGameManager() {
   const pushSnapshot = useCallback((state: GameState) => {
     setHistorySnapshots((prev) => [...prev.slice(-19), JSON.parse(JSON.stringify(state))]);
   }, []);
+
+  const updateSavedGamesIndex = useCallback((game: GameState) => {
+    setSavedGames((prev) => {
+      const item = createSavedGameItem(game);
+      const filtered = prev.filter((g) => g.id !== game.id);
+      return [item, ...filtered].slice(0, 30);
+    });
+  }, [setSavedGames]);
 
   /**
    * Créer et démarrer une nouvelle partie
@@ -71,8 +105,9 @@ export function useGameManager() {
 
     setHistorySnapshots([]);
     setActiveGame(newGame);
+    updateSavedGamesIndex(newGame);
     return newGame;
-  }, [setActiveGame, setSavedPlayers]);
+  }, [setActiveGame, setSavedPlayers, updateSavedGamesIndex]);
 
   /**
    * Valider la saisie d'une manche complète
@@ -121,12 +156,13 @@ export function useGameManager() {
     };
 
     setActiveGame(updatedGame);
+    updateSavedGamesIndex(updatedGame);
 
     // Si la partie est terminée, l'archiver dans l'historique
     if (isLastRound) {
       setGameHistory((prev) => [updatedGame, ...prev.slice(0, 29)]);
     }
-  }, [activeGame, pushSnapshot, setActiveGame, setGameHistory]);
+  }, [activeGame, pushSnapshot, setActiveGame, setGameHistory, updateSavedGamesIndex]);
 
   /**
    * Passer de l'écran récapitulatif à la manche suivante
@@ -197,9 +233,29 @@ export function useGameManager() {
     setActiveGame(null);
   }, [activeGame, pushSnapshot, setActiveGame]);
 
+  /**
+   * Charger une partie sauvegardée
+   */
+  const loadGame = useCallback((savedItem: SavedGameItem) => {
+    setHistorySnapshots([]);
+    setActiveGame(savedItem.gameSnapshot);
+    updateSavedGamesIndex(savedItem.gameSnapshot);
+  }, [setActiveGame, updateSavedGamesIndex]);
+
+  /**
+   * Supprimer une partie sauvegardée
+   */
+  const deleteSavedGame = useCallback((id: string) => {
+    setSavedGames((prev) => prev.filter((g) => g.id !== id));
+    if (activeGame && activeGame.id === id) {
+      setActiveGame(null);
+    }
+  }, [activeGame, setActiveGame, setSavedGames]);
+
   return {
     activeGame,
     gameHistory,
+    savedGames,
     savedPlayers,
     setSavedPlayers,
     settings,
@@ -211,6 +267,8 @@ export function useGameManager() {
     undoLastAction,
     editCurrentRound,
     resetGame,
+    loadGame,
+    deleteSavedGame,
     createEmptyBonuses,
   };
 }

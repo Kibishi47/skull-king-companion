@@ -71,3 +71,18 @@ export interface GameState {
   currentRoundIndex: number;
   status: 'setup' | 'bidding' | 'tricks' | 'recap' | 'completed';
 }
+
+export interface SavedGamePlayerSummary {
+  name: string;
+  score: number;
+}
+
+export interface SavedGameItem {
+  id: string;
+  date: number;
+  players: SavedGamePlayerSummary[];
+  currentRound: number;
+  totalRounds: number;
+  isFinished: boolean;
+  gameSnapshot: GameState;
+}
