@@ -4,7 +4,7 @@ import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { BonusDrawer } from './BonusDrawer';
 import { calculateBonusScore, createEmptyBonuses } from '../utils/scoring';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Crown, AlertTriangle, Gem, Swords, ArrowRight, ArrowLeft, Pencil, X } from 'lucide-react';
+import { Crown, AlertTriangle, Gem, Swords, ArrowRight, ArrowLeft, Pencil, X, Trophy } from 'lucide-react';
 
 interface RoundEntryProps {
   gameState: GameState;
@@ -204,13 +204,16 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
           </div>
         </div>
 
-        <button
+        <ButtonPirate
           type="button"
           onClick={onOpenScoreboard}
-          className="text-xs font-display font-bold text-ink bg-parchment border border-parchment-shadow px-3 py-1.5 rounded-lg hover:bg-parchment-deep transition-colors"
+          variant="wood"
+          size="sm"
+          className="gap-1.5 shadow-sm text-xs"
         >
-          Grille
-        </button>
+          <Trophy className="w-3.5 h-3.5 text-gold" />
+          <span>Scores</span>
+        </ButtonPirate>
       </div>
 
       {/* Étape 1 : Saisie des Mises (Bidding) */}

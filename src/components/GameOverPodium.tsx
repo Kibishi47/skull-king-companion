@@ -131,29 +131,29 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
       </ParchmentCard>
 
       {/* Raccourcis et Actions */}
-      <div className="space-y-3 pt-2">
+      <div className="space-y-3 pt-2 w-full max-w-md mx-auto box-border">
         <ButtonPirate
           type="button"
           onClick={onOpenScoreboard}
           variant="wood"
           size="md"
-          className="w-full gap-2 whitespace-nowrap"
+          className="w-full gap-2 whitespace-nowrap shadow-md"
         >
-          <Trophy className="w-4 h-4" />
-          <span>Grille de score</span>
+          <Trophy className="w-4 h-4 text-gold shrink-0" />
+          <span className="truncate">Tableau des scores</span>
         </ButtonPirate>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2.5 w-full box-border">
           <ButtonPirate
             type="button"
             onClick={onUndo}
             disabled={!canUndo}
             variant="ghost"
             size="md"
-            className="gap-1.5 whitespace-nowrap"
+            className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>Annuler manche</span>
+            <RotateCcw className="w-4 h-4 shrink-0" />
+            <span className="truncate">Annuler manche</span>
           </ButtonPirate>
 
           <ButtonPirate
@@ -161,10 +161,10 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
             onClick={onNewGame}
             variant="wax"
             size="lg"
-            className="flex-1 gap-2 shadow-xl whitespace-nowrap"
+            className="w-full min-w-0 gap-2 shadow-xl whitespace-nowrap text-xs sm:text-base font-extrabold truncate"
           >
-            <Swords className="w-5 h-5" />
-            <span>Nouvelle partie</span>
+            <Swords className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span className="truncate">Nouvelle partie</span>
           </ButtonPirate>
         </div>
       </div>

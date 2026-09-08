@@ -107,16 +107,18 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
         })}
       </div>
 
-      {/* Raccourci vers la grille complète */}
-      <div className="text-center">
-        <button
+      {/* Bouton vers la grille de score */}
+      <div className="w-full max-w-md mx-auto">
+        <ButtonPirate
           type="button"
           onClick={onOpenScoreboard}
-          className="text-xs sm:text-sm font-bold font-display text-gold-deep hover:underline inline-flex items-center gap-1.5"
+          variant="wood"
+          size="md"
+          className="w-full gap-2 shadow-md whitespace-nowrap text-xs sm:text-sm"
         >
-          <Trophy className="w-4 h-4" />
-          <span>Consulter le Tableau de Score Complet</span>
-        </button>
+          <Trophy className="w-4 h-4 text-gold shrink-0" />
+          <span className="truncate">Tableau des scores</span>
+        </ButtonPirate>
       </div>
 
       {/* Barre d'actions : Modifier la manche et Prochaine manche */}
