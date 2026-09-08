@@ -20,7 +20,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   // Initialisation avec 3 champs vierges
   const [playerInputs, setPlayerInputs] = useState<string[]>(['', '', '']);
   const [settings, setSettings] = useState<GameSettings>(initialSettings);
-  const [customRounds, setCustomRounds] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [customRounds, setCustomRounds] = useState<string[]>(['1', '2', '3', '4', '5']);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const handlePlayerInputChange = (index: number, value: string) => {
@@ -64,15 +64,27 @@ export const GameSetup: React.FC<GameSetupProps> = ({
     });
   };
 
-  const handleCustomRoundChange = (index: number, count: number) => {
+  const handleCustomRoundChange = (index: number, rawValue: string) => {
+    // Autoriser le champ vide pour permettre à l'utilisateur d'effacer et retaper
     const updated = [...customRounds];
-    updated[index] = Math.max(1, Math.min(10, count));
+    if (rawValue === '') {
+      updated[index] = '';
+    } else {
+      const parsed = parseInt(rawValue, 10);
+      if (isNaN(parsed)) {
+        updated[index] = '';
+      } else {
+        // Borner entre 1 et 10
+        updated[index] = String(Math.max(1, Math.min(10, parsed)));
+      }
+    }
     setCustomRounds(updated);
   };
 
   const addCustomRound = () => {
     if (customRounds.length >= 15) return;
-    setCustomRounds([...customRounds, Math.min(10, customRounds.length + 1)]);
+    const nextCount = Math.min(10, customRounds.length + 1);
+    setCustomRounds([...customRounds, String(nextCount)]);
   };
 
   const removeCustomRound = (index: number) => {
@@ -80,13 +92,29 @@ export const GameSetup: React.FC<GameSetupProps> = ({
     setCustomRounds(customRounds.filter((_, i) => i !== index));
   };
 
+  // Validation pour le mode personnalisé : chaque manche doit avoir un nombre valide entre 1 et 10
+  const isCustomConfigValid =
+    settings.presetId !== 'custom' ||
+    (customRounds.length > 0 &&
+      customRounds.every((val) => {
+        const num = parseInt(val, 10);
+        return !isNaN(num) && num >= 1 && num <= 10;
+      }));
+
   const handleStart = () => {
+    if (!isCustomConfigValid) return;
+
     // Résolution des noms : nom saisi ou fallback "Joueur X" sobre
     const finalPlayerNames = playerInputs.map((p, idx) => p.trim() || `Joueur ${idx + 1}`);
 
+    const finalCardCounts =
+      settings.presetId === 'custom'
+        ? customRounds.map((v) => parseInt(v, 10))
+        : undefined;
+
     const finalSettings: GameSettings = {
       ...settings,
-      customCardCounts: settings.presetId === 'custom' ? customRounds : undefined,
+      customCardCounts: finalCardCounts,
     };
     onStartGame(finalPlayerNames, finalSettings);
   };
@@ -321,32 +349,46 @@ export const GameSetup: React.FC<GameSetupProps> = ({
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {customRounds.map((count, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center bg-white/70 border border-parchment-deep rounded-md px-2 py-1 gap-1"
-                >
-                  <span className="text-xs text-ink-faded font-bold">M{idx + 1}:</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={count}
-                    onChange={(e) => handleCustomRoundChange(idx, parseInt(e.target.value) || 1)}
-                    className="w-10 text-center font-bold text-ink bg-transparent focus:outline-none text-base"
-                  />
-                  {customRounds.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeCustomRound(idx)}
-                      className="text-wax hover:text-wax-dark ml-1 text-xs"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
+              {customRounds.map((count, idx) => {
+                const isEmptyOrInvalid = count === '' || isNaN(parseInt(count, 10));
+                return (
+                  <div
+                    key={idx}
+                    className={`flex items-center bg-white/70 border rounded-md px-2 py-1 gap-1 transition-colors ${
+                      isEmptyOrInvalid
+                        ? 'border-wax ring-1 ring-wax'
+                        : 'border-parchment-deep'
+                    }`}
+                  >
+                    <span className="text-xs text-ink-faded font-bold">M{idx + 1}:</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={count}
+                      placeholder="?"
+                      onChange={(e) => handleCustomRoundChange(idx, e.target.value)}
+                      className="w-10 text-center font-bold text-ink bg-transparent focus:outline-none text-base placeholder:text-ink-faded/50"
+                    />
+                    {customRounds.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeCustomRound(idx)}
+                        className="text-wax hover:text-wax-dark ml-1 text-xs font-bold"
+                        title="Supprimer la manche"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+            {!isCustomConfigValid && (
+              <p className="text-xs text-wax font-medium mt-1">
+                Indiquez un nombre de cartes (1 à 10) pour chaque manche avant de démarrer.
+              </p>
+            )}
           </div>
         )}
       </ParchmentCard>
@@ -356,12 +398,15 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         <ButtonPirate
           type="button"
           onClick={handleStart}
+          disabled={!isCustomConfigValid}
           variant="wax"
           size="lg"
-          className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap"
+          className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Swords className="w-5 h-5" />
-          <span>Démarrer la partie</span>
+          <span>
+            {isCustomConfigValid ? 'Démarrer la partie' : 'Configuration incomplète'}
+          </span>
         </ButtonPirate>
       </div>
     </div>
