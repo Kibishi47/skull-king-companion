@@ -118,8 +118,7 @@ export function App() {
             gameState={activeGame}
             onNewGame={resetGame}
             onOpenScoreboard={() => setIsScoreboardOpen(true)}
-            onUndo={undoLastAction}
-            canUndo={canUndo}
+            onEditRound={editRoundJustFinished}
           />
         )}
       </main>

@@ -2,23 +2,21 @@ import React, { useEffect } from 'react';
 import { GameState } from '../types/game';
 import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Trophy, Crown, RotateCcw, Swords, Flame, Sparkles } from 'lucide-react';
+import { Trophy, Crown, Swords, Flame, Sparkles, Pencil } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface GameOverPodiumProps {
   gameState: GameState;
   onNewGame: () => void;
   onOpenScoreboard: () => void;
-  onUndo: () => void;
-  canUndo: boolean;
+  onEditRound: () => void;
 }
 
 export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
   gameState,
   onNewGame,
   onOpenScoreboard,
-  onUndo,
-  canUndo,
+  onEditRound,
 }) => {
   // Déclencher les feux d'artifice/confettis à l'apparition du podium
   useEffect(() => {
@@ -137,23 +135,22 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
           onClick={onOpenScoreboard}
           variant="wood"
           size="md"
-          className="w-full gap-2 whitespace-nowrap shadow-md"
+          className="w-full gap-2 whitespace-nowrap shadow-md py-3"
         >
           <Trophy className="w-4 h-4 text-gold shrink-0" />
-          <span className="truncate">Tableau des scores</span>
+          <span>Tableau des scores</span>
         </ButtonPirate>
 
-        <div className="grid grid-cols-2 gap-2.5 w-full box-border">
+        <div className="flex flex-col sm:flex-row gap-2.5 w-full box-border">
           <ButtonPirate
             type="button"
-            onClick={onUndo}
-            disabled={!canUndo}
+            onClick={onEditRound}
             variant="ghost"
             size="md"
-            className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
+            className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
           >
-            <RotateCcw className="w-4 h-4 shrink-0" />
-            <span className="truncate">Annuler manche</span>
+            <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
+            <span>Modifier la manche</span>
           </ButtonPirate>
 
           <ButtonPirate
@@ -161,10 +158,10 @@ export const GameOverPodium: React.FC<GameOverPodiumProps> = ({
             onClick={onNewGame}
             variant="wax"
             size="lg"
-            className="w-full min-w-0 gap-2 shadow-xl whitespace-nowrap text-xs sm:text-base font-extrabold truncate"
+            className="flex-1 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
           >
             <Swords className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-            <span className="truncate">Nouvelle partie</span>
+            <span>Nouvelle partie</span>
           </ButtonPirate>
         </div>
       </div>

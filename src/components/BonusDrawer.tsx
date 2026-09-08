@@ -34,14 +34,14 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Drawer */}
-        <div className="flex items-center justify-between border-b border-parchment-shadow pb-3">
-          <div className="flex items-center gap-2">
-            <Gem className="w-6 h-6 text-gold-deep" />
-            <div>
-              <h3 className="font-pirate text-lg sm:text-xl text-ink font-bold">
+        <div className="flex items-start justify-between gap-3 border-b border-parchment-shadow pb-3">
+          <div className="flex items-start gap-2.5 min-w-0">
+            <Gem className="w-6 h-6 text-gold-deep shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <h3 className="font-pirate text-base sm:text-xl text-ink font-bold leading-tight break-words">
                 Trésors & Bonus de {playerName}
               </h3>
-              <p className="text-xs text-ink-faded font-sans">
+              <p className="text-xs text-ink-faded font-sans mt-0.5">
                 Seuls les contrats réussis valident les butins !
               </p>
             </div>
@@ -49,7 +49,8 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-ink-faded hover:text-ink hover:bg-parchment transition-colors"
+            className="p-1 rounded-lg text-ink-faded hover:text-ink hover:bg-parchment transition-colors shrink-0"
+            aria-label="Fermer"
           >
             <X className="w-6 h-6" />
           </button>
@@ -58,16 +59,18 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
         {/* Lignes de bonus interactives */}
         <div className="space-y-3">
           {/* 14 de couleur */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-pirate-emerald inline-block" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <span className="w-3 h-3 rounded-full bg-pirate-emerald shrink-0 inline-block" />
                 <span>14 de couleur</span>
-                <span className="text-xs text-gold-deep font-bold">+10</span>
               </div>
-              <p className="text-xs text-ink-light">Vert, Jaune, Violet</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+10 pts</span>
+                <span className="text-xs text-ink-light truncate">Vert, Jaune, Violet</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => updateBonus('standard14s', Math.max(0, bonuses.standard14s - 1))}
@@ -87,16 +90,18 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
 
           {/* 14 Noir Atout */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-pirate-black inline-block border border-gold" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <span className="w-3 h-3 rounded-full bg-pirate-black shrink-0 inline-block border border-gold" />
                 <span>14 Noir</span>
-                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Jolly Roger</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+20 pts</span>
+                <span className="text-xs text-ink-light truncate">Jolly Roger</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => updateBonus('black14', Math.max(0, bonuses.black14 - 1))}
@@ -116,16 +121,18 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
 
           {/* Sirène capturée par un Pirate */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-pirate-cyan" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <Sparkles className="w-4 h-4 text-pirate-cyan shrink-0" />
                 <span>Sirène prise par Pirate</span>
-                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Par sirène</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+20 pts</span>
+                <span className="text-xs text-ink-light truncate">Par sirène</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => updateBonus('mermaidsByPirate', Math.max(0, bonuses.mermaidsByPirate - 1))}
@@ -145,16 +152,18 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
 
           {/* Pirate capturé par le Skull King */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <Anchor className="w-4 h-4 text-wax" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <Anchor className="w-4 h-4 text-wax shrink-0" />
                 <span>Pirate pris par Skull King</span>
-                <span className="text-xs text-gold-deep font-bold">+30</span>
               </div>
-              <p className="text-xs text-ink-light">Par pirate</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+30 pts</span>
+                <span className="text-xs text-ink-light truncate">Par pirate</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => updateBonus('piratesBySkullKing', Math.max(0, bonuses.piratesBySkullKing - 1))}
@@ -174,16 +183,18 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
 
           {/* Skull King capturé par une Sirène */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-wax" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <Sparkles className="w-4 h-4 text-wax shrink-0" />
                 <span>Skull King pris par Sirène</span>
-                <span className="text-xs text-gold-deep font-bold">+40</span>
               </div>
-              <p className="text-xs text-ink-light">Prise suprême</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+40 pts</span>
+                <span className="text-xs text-ink-light truncate">Prise suprême</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => updateBonus('skullKingByMermaid', Math.max(0, bonuses.skullKingByMermaid - 1))}
@@ -203,19 +214,21 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
 
           {/* Alliance Butin */}
-          <div className="flex items-center justify-between bg-parchment p-3 rounded-lg border border-parchment-deep">
-            <div>
-              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-                <Gem className="w-4 h-4 text-gold-deep" />
+          <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
+            <div className="min-w-0">
+              <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5 leading-snug">
+                <Gem className="w-4 h-4 text-gold-deep shrink-0" />
                 <span>Alliance Butin</span>
-                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Pari d'alliance réussi</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">+20 pts</span>
+                <span className="text-xs text-ink-light truncate">Pari d'alliance réussi</span>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => updateBonus('lootAlliance', !bonuses.lootAlliance)}
-              className={`px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap shrink-0 transition-all ${
                 bonuses.lootAlliance
                   ? 'bg-gold text-ink-pure shadow-sm'
                   : 'bg-parchment-dark text-ink-light'
@@ -227,9 +240,13 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
 
           {/* Pari Rascal le Flambeur */}
           <div className="bg-parchment p-3 rounded-lg border border-parchment-deep space-y-2">
-            <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-              <span>Pari Rascal</span>
-              <span className="text-xs text-gold-deep font-bold">±10 / ±20</span>
+            <div>
+              <div className="font-display font-bold text-ink text-sm sm:text-base leading-snug">
+                Pari Rascal
+              </div>
+              <div className="mt-1">
+                <span className="text-xs text-gold-deep font-black bg-gold/15 px-1.5 py-0.5 rounded shrink-0">±10 / ±20 pts</span>
+              </div>
             </div>
             <div className="grid grid-cols-5 gap-1">
               {([-20, -10, 0, 10, 20] as const).map((val) => (

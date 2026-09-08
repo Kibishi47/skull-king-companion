@@ -189,15 +189,15 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
       )}
 
       {/* Barre d'en-tête de la manche */}
-      <div className="flex items-center justify-between bg-parchment-light border-2 border-parchment-deep rounded-xl p-3 shadow-md">
-        <div className="flex items-center gap-2.5">
-          <SkullKingLogo size={42} />
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-pirate text-lg sm:text-xl text-ink font-bold leading-tight">
-                Manche {currentRound.roundNumber} / {gameState.rounds.length}
+      <div className="flex items-center justify-between gap-2 bg-parchment-light border-2 border-parchment-deep rounded-xl p-3 shadow-md">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <SkullKingLogo size={40} className="shrink-0" />
+          <div className="min-w-0">
+            <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
+              <h2 className="font-pirate text-base sm:text-xl text-ink font-bold whitespace-nowrap leading-none">
+                Manche {currentRound.roundNumber}&nbsp;/&nbsp;{gameState.rounds.length}
               </h2>
-              <span className="bg-gold-deep text-parchment-light px-2 py-0.5 rounded-full text-xs font-bold font-display">
+              <span className="bg-gold-deep text-parchment-light px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold font-display whitespace-nowrap shrink-0">
                 {cardCount} {cardCount > 1 ? 'cartes' : 'carte'}
               </span>
             </div>
@@ -209,9 +209,9 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
           onClick={onOpenScoreboard}
           variant="wood"
           size="sm"
-          className="gap-1.5 shadow-sm text-xs"
+          className="gap-1.5 shadow-sm text-xs shrink-0"
         >
-          <Trophy className="w-3.5 h-3.5 text-gold" />
+          <Trophy className="w-3.5 h-3.5 text-gold shrink-0" />
           <span>Scores</span>
         </ButtonPirate>
       </div>
@@ -245,17 +245,17 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     </div>
                   </div>
 
-                  {/* Pavé tactile rapide de sélection de la mise */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  {/* Pavé tactile rapide de sélection de la mise : centré avec largeur fixe homogène */}
+                  <div className="flex flex-wrap justify-center gap-1.5 pt-1">
                     {Array.from({ length: cardCount + 1 }).map((_, n) => (
                       <button
                         key={n}
                         type="button"
                         onClick={() => updateBid(player.id, n)}
-                        className={`min-w-[40px] flex-1 py-2 rounded-lg font-bold text-sm sm:text-base transition-all ${
+                        className={`w-11 h-11 flex items-center justify-center rounded-lg font-bold text-base transition-all shrink-0 ${
                           currentBid === n
                             ? n === 0
-                              ? 'bg-wax text-white ring-2 ring-wax-border shadow-md'
+                              ? 'bg-wax text-white ring-2 ring-wax-border shadow-md font-extrabold'
                               : 'gold-gradient text-ink-pure ring-2 ring-gold-deep shadow-md font-extrabold'
                             : 'bg-parchment text-ink border border-parchment-shadow hover:bg-parchment-dark'
                         }`}
@@ -302,15 +302,15 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
 
           {/* Boutons d'action de l'étape des mises */}
           {isEditing ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
+            <div className="flex flex-col sm:flex-row gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
               <ButtonPirate
                 type="button"
                 onClick={() => setStep('tricks')}
                 variant="ghost"
                 size="md"
-                className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
+                className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
               >
-                <span className="truncate">Passer aux plis</span>
+                <span>Passer aux plis</span>
                 <ArrowRight className="w-4 h-4 shrink-0" />
               </ButtonPirate>
 
@@ -320,12 +320,12 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                 disabled={totalTricks !== cardCount}
                 variant="wax"
                 size="lg"
-                className="sm:col-span-2 w-full min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold truncate"
+                className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
               >
                 <Swords className="w-5 h-5 shrink-0" />
-                <span className="truncate">
+                <span>
                   {totalTricks === cardCount
-                    ? 'Enregistrer les modifications'
+                    ? 'Enregistrer'
                     : `Plis requis : ${totalTricks} / ${cardCount}`}
                 </span>
               </ButtonPirate>
@@ -350,7 +350,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
         <div className="space-y-4 animate-fade-in">
           {/* Indicateur clair du compte des plis avec contrôle d'intégrité */}
           <div
-            className={`flex items-center justify-between p-3 rounded-lg border-2 font-display ${
+            className={`p-3 rounded-lg border-2 font-display transition-colors ${
               totalTricks === cardCount
                 ? 'bg-emerald-50/80 border-emerald-600 text-emerald-900'
                 : totalTricks < cardCount
@@ -358,20 +358,22 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                 : 'bg-rose-50/80 border-rose-600 text-rose-900'
             }`}
           >
-            <div className="flex items-center gap-2">
-              {totalTricks !== cardCount && <AlertTriangle className="w-5 h-5 shrink-0" />}
-              <span className="font-bold text-sm">
-                Total des plis réalisés :{' '}
-                <span className="font-mono text-base font-black underline">{totalTricks}</span> / {cardCount}
-              </span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                {totalTricks !== cardCount && <AlertTriangle className="w-5 h-5 shrink-0" />}
+                <span className="font-bold text-sm sm:text-base leading-tight">
+                  Total des plis réalisés :{' '}
+                  <span className="font-mono text-base sm:text-lg font-black underline">{totalTricks}</span> / {cardCount}
+                </span>
+              </div>
             </div>
-            <span className="text-xs font-semibold">
+            <div className="mt-1 text-xs font-semibold pl-0 sm:pl-7">
               {totalTricks === cardCount
-                ? 'Compte exact'
+                ? '✓ Compte exact'
                 : totalTricks < cardCount
-                ? `Il manque ${cardCount - totalTricks} pli(s)`
-                : `${totalTricks - cardCount} pli(s) en trop`}
-            </span>
+                ? `⚠️ Il manque ${cardCount - totalTricks} pli(s)`
+                : `⚠️ ${totalTricks - cardCount} pli(s) en trop`}
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -412,14 +414,14 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     </button>
                   </div>
 
-                  {/* Pavé tactile pour les plis */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  {/* Pavé tactile pour les plis : centré avec largeur fixe homogène */}
+                  <div className="flex flex-wrap justify-center gap-1.5 pt-1">
                     {Array.from({ length: cardCount + 1 }).map((_, n) => (
                       <button
                         key={n}
                         type="button"
                         onClick={() => updateTricks(player.id, n)}
-                        className={`min-w-[40px] flex-1 py-2 rounded-lg font-bold text-sm sm:text-base transition-all ${
+                        className={`w-11 h-11 flex items-center justify-center rounded-lg font-bold text-base transition-all shrink-0 ${
                           currentTricks === n
                             ? 'bg-pirate-wood text-parchment-light ring-2 ring-gold shadow-md font-extrabold'
                             : 'bg-parchment text-ink border border-parchment-shadow hover:bg-parchment-dark'
@@ -435,16 +437,16 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
           </div>
 
           {/* Boutons d'action avec validation bloquante */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
             <ButtonPirate
               type="button"
               onClick={() => setStep('bidding')}
               variant="ghost"
               size="md"
-              className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
+              className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
             >
               <ArrowLeft className="w-4 h-4 shrink-0" />
-              <span className="truncate">Modifier mises</span>
+              <span>Modifier mises</span>
             </ButtonPirate>
 
             <ButtonPirate
@@ -453,13 +455,13 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               disabled={totalTricks !== cardCount}
               variant="wax"
               size="lg"
-              className="sm:col-span-2 w-full min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold truncate"
+              className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
             >
               <Swords className="w-5 h-5 shrink-0" />
-              <span className="truncate">
+              <span>
                 {totalTricks === cardCount
                   ? isEditing
-                    ? 'Enregistrer les modifications'
+                    ? 'Enregistrer'
                     : 'Valider la manche'
                   : `Plis requis : ${totalTricks} / ${cardCount}`}
               </span>

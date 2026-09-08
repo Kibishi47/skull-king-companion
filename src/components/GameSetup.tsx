@@ -199,14 +199,14 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         </div>
 
         {/* Actions sous la liste des joueurs */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex flex-col sm:flex-row gap-2 pt-1 w-full box-border">
           {playerInputs.length < 8 && (
             <button
               type="button"
               onClick={() => handleAddPlayerField('')}
-              className="flex-1 py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="w-full sm:flex-1 py-2.5 px-3 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap min-w-0"
             >
-              <Plus className="w-4 h-4 text-gold-deep" />
+              <Plus className="w-4 h-4 text-gold-deep shrink-0" />
               <span>Ajouter un joueur</span>
             </button>
           )}
@@ -215,9 +215,9 @@ export const GameSetup: React.FC<GameSetupProps> = ({
             <button
               type="button"
               onClick={() => setIsPickerOpen(true)}
-              className="py-2 px-3 bg-parchment border border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment-deep transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="w-full sm:flex-1 py-2.5 px-3 bg-parchment border border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment-deep transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap min-w-0 shadow-xs"
             >
-              <Users className="w-4 h-4 text-gold-deep" />
+              <Users className="w-4 h-4 text-gold-deep shrink-0" />
               <span>Joueurs récents</span>
             </button>
           )}
@@ -348,19 +348,19 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                 + Ajouter une manche
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {customRounds.map((count, idx) => {
                 const isEmptyOrInvalid = count === '' || isNaN(parseInt(count, 10));
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center bg-white/70 border rounded-md px-2 py-1 gap-1 transition-colors ${
+                    className={`flex items-center justify-between bg-white/70 border rounded-md px-2 py-1.5 min-w-0 transition-colors ${
                       isEmptyOrInvalid
                         ? 'border-wax ring-1 ring-wax'
                         : 'border-parchment-deep'
                     }`}
                   >
-                    <span className="text-xs text-ink-faded font-bold">M{idx + 1}:</span>
+                    <span className="text-xs text-ink-faded font-bold shrink-0">M{idx + 1}:</span>
                     <input
                       type="number"
                       min={1}
@@ -368,13 +368,13 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                       value={count}
                       placeholder="?"
                       onChange={(e) => handleCustomRoundChange(idx, e.target.value)}
-                      className="w-10 text-center font-bold text-ink bg-transparent focus:outline-none text-base placeholder:text-ink-faded/50"
+                      className="w-full text-center font-bold text-ink bg-transparent focus:outline-none text-base placeholder:text-ink-faded/50 min-w-0"
                     />
                     {customRounds.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeCustomRound(idx)}
-                        className="text-wax hover:text-wax-dark ml-1 text-xs font-bold"
+                        className="text-wax hover:text-wax-dark ml-0.5 text-xs font-bold shrink-0 p-0.5"
                         title="Supprimer la manche"
                       >
                         ×

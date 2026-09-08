@@ -122,16 +122,16 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
       </div>
 
       {/* Barre d'actions : Modifier la manche et Prochaine manche */}
-      <div className="grid grid-cols-2 gap-3 w-full max-w-md mx-auto pt-2 box-border">
+      <div className="flex flex-col sm:flex-row gap-2.5 w-full max-w-md mx-auto pt-2 box-border">
         <ButtonPirate
           type="button"
           onClick={onEditRound}
           variant="ghost"
           size="md"
-          className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
+          className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
         >
           <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
-          <span className="truncate">Modifier la manche</span>
+          <span>Modifier la manche</span>
         </ButtonPirate>
 
         <ButtonPirate
@@ -139,9 +139,9 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
           onClick={onProceed}
           variant="wax"
           size="lg"
-          className="w-full min-w-0 gap-2 shadow-xl whitespace-nowrap text-xs sm:text-base font-extrabold truncate"
+          className="flex-1 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
         >
-          <span className="truncate">Manche suivante</span>
+          <span>Manche suivante</span>
           <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
         </ButtonPirate>
       </div>
