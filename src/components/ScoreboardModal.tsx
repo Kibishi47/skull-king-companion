@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
 import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
@@ -18,6 +18,13 @@ export const ScoreboardModal: React.FC<ScoreboardModalProps> = ({
   onEditRound,
 }) => {
   const [activeTab, setActiveTab] = useState<'ranking' | 'matrix'>('ranking');
+
+  // Forcer systématiquement l'onglet « Classement » à chaque ouverture de la modale
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab('ranking');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
