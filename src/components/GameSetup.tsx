@@ -3,23 +3,29 @@ import { GameSettings, RoundPreset } from '../types/game';
 import { ROUND_PRESETS } from '../utils/presets';
 import { ButtonPirate, ParchmentCard } from './ParchmentUI';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles } from 'lucide-react';
+import { Users, Plus, Trash2, Swords, Shield, Settings2, Sparkles, Search, FolderOpen } from 'lucide-react';
+import { PlayerPickerModal } from './PlayerPickerModal';
 
 interface GameSetupProps {
   onStartGame: (players: string[], settings: GameSettings) => void;
   savedPlayers: string[];
   initialSettings: GameSettings;
+  savedGamesCount?: number;
+  onOpenSavedGames?: () => void;
 }
 
 export const GameSetup: React.FC<GameSetupProps> = ({
   onStartGame,
   savedPlayers,
   initialSettings,
+  savedGamesCount = 0,
+  onOpenSavedGames,
 }) => {
   // Initialisation avec 3 champs vierges
   const [playerInputs, setPlayerInputs] = useState<string[]>(['', '', '']);
   const [settings, setSettings] = useState<GameSettings>(initialSettings);
   const [customRounds, setCustomRounds] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [pickerTargetIndex, setPickerTargetIndex] = useState<number | null>(null);
 
   const handlePlayerInputChange = (index: number, value: string) => {
     const updated = [...playerInputs];
@@ -35,16 +41,6 @@ export const GameSetup: React.FC<GameSetupProps> = ({
   const handleRemovePlayerField = (index: number) => {
     if (playerInputs.length <= 2) return; // 2 joueurs minimum
     setPlayerInputs(playerInputs.filter((_, i) => i !== index));
-  };
-
-  const handleSelectRecentPlayer = (name: string) => {
-    // Si un champ est vide, on l'y met, sinon on ajoute un champ s'il reste de la place
-    const emptyIndex = playerInputs.findIndex((p) => !p.trim());
-    if (emptyIndex !== -1) {
-      handlePlayerInputChange(emptyIndex, name);
-    } else if (playerInputs.length < 8) {
-      handleAddPlayerField(name);
-    }
   };
 
   const handlePresetSelect = (preset: RoundPreset) => {
@@ -94,6 +90,22 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         <p className="text-ink-faded font-display text-sm tracking-widest uppercase mt-1">
           Carnet de bord & Tenue de score
         </p>
+
+        {/* Bouton Charger une partie sur l'écran d'accueil */}
+        {onOpenSavedGames && (
+          <div className="pt-3">
+            <ButtonPirate
+              type="button"
+              onClick={onOpenSavedGames}
+              variant="wood"
+              size="sm"
+              className="gap-2 whitespace-nowrap shadow-sm"
+            >
+              <FolderOpen className="w-4 h-4 text-gold" />
+              <span>Charger une partie</span>
+            </ButtonPirate>
+          </div>
+        )}
       </div>
 
       {/* Sélection des Joueurs */}
@@ -106,13 +118,14 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           <span className="text-xs text-ink-faded font-sans">2 à 8 joueurs</span>
         </div>
 
-        {/* Liste des champs de saisie pour chaque joueur */}
+        {/* Liste des champs de saisie pour chaque joueur avec bouton de recherche */}
         <div className="space-y-2.5">
           {playerInputs.map((name, idx) => (
-            <div key={idx} className="flex items-center gap-2">
+            <div key={idx} className="flex items-center gap-1.5">
               <span className="w-7 h-7 rounded-full bg-pirate-wood text-gold text-xs flex items-center justify-center font-bold shrink-0">
                 {idx + 1}
               </span>
+
               <input
                 type="text"
                 value={name}
@@ -121,11 +134,25 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                 maxLength={20}
                 className="flex-1 bg-white/90 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
               />
+
+              {/* Bouton de recherche/sélection parmi les profils enregistrés */}
+              {savedPlayers.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setPickerTargetIndex(idx)}
+                  title="Sélectionner un joueur existant"
+                  aria-label={`Sélectionner un joueur pour l'emplacement ${idx + 1}`}
+                  className="p-2.5 rounded-lg bg-parchment border border-parchment-shadow text-gold-deep hover:bg-parchment-dark transition-colors shrink-0"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              )}
+
               {playerInputs.length > 2 && (
                 <button
                   type="button"
                   onClick={() => handleRemovePlayerField(idx)}
-                  className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors"
+                  className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors shrink-0"
                   aria-label={`Supprimer le joueur ${idx + 1}`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -141,36 +168,28 @@ export const GameSetup: React.FC<GameSetupProps> = ({
             <button
               type="button"
               onClick={() => handleAddPlayerField('')}
-              className="w-full py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2 border-2 border-dashed border-parchment-shadow rounded-lg text-ink font-display font-semibold text-sm hover:bg-parchment transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 text-gold-deep" />
               <span>Ajouter un joueur</span>
             </button>
           </div>
         )}
-
-        {/* Joueurs récents / favoris */}
-        {savedPlayers.filter(p => !playerInputs.includes(p)).length > 0 && (
-          <div className="pt-2 border-t border-parchment-deep">
-            <p className="text-xs text-ink-faded mb-2 font-display">Joueurs récents :</p>
-            <div className="flex flex-wrap gap-1.5">
-              {savedPlayers
-                .filter((p) => !playerInputs.includes(p))
-                .slice(0, 10)
-                .map((name, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleSelectRecentPlayer(name)}
-                    className="text-xs bg-parchment hover:bg-parchment-deep text-ink px-2.5 py-1 rounded-md border border-parchment-shadow transition-colors"
-                  >
-                    + {name}
-                  </button>
-                ))}
-            </div>
-          </div>
-        )}
       </ParchmentCard>
+
+      {/* Modale de sélection de profil joueur */}
+      {pickerTargetIndex !== null && (
+        <PlayerPickerModal
+          isOpen={pickerTargetIndex !== null}
+          onClose={() => setPickerTargetIndex(null)}
+          targetIndex={pickerTargetIndex}
+          currentAssignedPlayers={playerInputs}
+          savedPlayers={savedPlayers}
+          onSelectPlayer={(index, selectedName) => {
+            handlePlayerInputChange(index, selectedName);
+          }}
+        />
+      )}
 
       {/* Règles & Variantes */}
       <ParchmentCard variant="light" className="space-y-4">
