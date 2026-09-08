@@ -62,8 +62,8 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
             <div>
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-pirate-emerald inline-block" />
-                <span>Cartes 14 de couleur</span>
-                <span className="text-xs text-gold-deep font-bold">(+10 pts ch.)</span>
+                <span>14 de couleur</span>
+                <span className="text-xs text-gold-deep font-bold">+10</span>
               </div>
               <p className="text-xs text-ink-light">Vert, Jaune, Violet</p>
             </div>
@@ -91,10 +91,10 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
             <div>
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-pirate-black inline-block border border-gold" />
-                <span>Carte 14 Noire Atout</span>
-                <span className="text-xs text-gold-deep font-bold">(+20 pts)</span>
+                <span>14 Noir</span>
+                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Jolly Roger Atout</p>
+              <p className="text-xs text-ink-light">Jolly Roger</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -120,10 +120,10 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
             <div>
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-pirate-cyan" />
-                <span>Sirène prise par un Pirate</span>
-                <span className="text-xs text-gold-deep font-bold">(+20 pts ch.)</span>
+                <span>Sirène prise par Pirate</span>
+                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Chaque sirène capturée</p>
+              <p className="text-xs text-ink-light">Par sirène</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -149,10 +149,10 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
             <div>
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <Anchor className="w-4 h-4 text-wax" />
-                <span>Pirate pris par le Skull King</span>
-                <span className="text-xs text-gold-deep font-bold">(+30 pts ch.)</span>
+                <span>Pirate pris par Skull King</span>
+                <span className="text-xs text-gold-deep font-bold">+30</span>
               </div>
-              <p className="text-xs text-ink-light">Chaque pirate capturé par le roi</p>
+              <p className="text-xs text-ink-light">Par pirate</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -179,9 +179,9 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-wax" />
                 <span>Skull King pris par Sirène</span>
-                <span className="text-xs text-gold-deep font-bold">(+40 pts)</span>
+                <span className="text-xs text-gold-deep font-bold">+40</span>
               </div>
-              <p className="text-xs text-ink-light">L'exploit suprême !</p>
+              <p className="text-xs text-ink-light">Prise suprême</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -208,9 +208,9 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
               <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
                 <Gem className="w-4 h-4 text-gold-deep" />
                 <span>Alliance Butin</span>
-                <span className="text-xs text-gold-deep font-bold">(+20 pts)</span>
+                <span className="text-xs text-gold-deep font-bold">+20</span>
               </div>
-              <p className="text-xs text-ink-light">Pari d'alliance réussi à deux</p>
+              <p className="text-xs text-ink-light">Pari d'alliance réussi</p>
             </div>
             <button
               type="button"
@@ -228,8 +228,8 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           {/* Pari Rascal le Flambeur */}
           <div className="bg-parchment p-3 rounded-lg border border-parchment-deep space-y-2">
             <div className="font-display font-bold text-ink text-sm sm:text-base flex items-center gap-1.5">
-              <span>Pari Rascal le Flambeur</span>
-              <span className="text-xs text-ink-light">(±10 ou ±20 pts)</span>
+              <span>Pari Rascal</span>
+              <span className="text-xs text-gold-deep font-bold">±10 / ±20</span>
             </div>
             <div className="grid grid-cols-5 gap-1">
               {([-20, -10, 0, 10, 20] as const).map((val) => (

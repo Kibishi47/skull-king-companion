@@ -194,7 +194,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
               <span>Classique</span>
             </div>
             <p className="text-xs text-ink-light mt-1 font-sans">
-              +20 pts/pli, -10 pts/pli d'écart. Zéro audacieux (+10/carte ou -10/carte).
+              Score traditionnel Skull King avec mises positives et mises à zéro.
             </p>
           </button>
 
@@ -209,10 +209,10 @@ export const GameSetup: React.FC<GameSetupProps> = ({
           >
             <div className="flex items-center gap-1.5 text-ink font-pirate font-bold text-base">
               <Shield className="w-4 h-4 text-gold-deep" />
-              <span>Mode Rascal</span>
+              <span>Rascal</span>
             </div>
             <p className="text-xs text-ink-light mt-1 font-sans">
-              Potentiel 10 pts/carte. Coup direct (100%), Frappe à revers (50%), ou Boulet de canon !
+              Variante avec potentiel de manche, coup direct et frappe à revers.
             </p>
           </button>
         </div>
@@ -222,7 +222,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
       <ParchmentCard variant="light" className="space-y-4">
         <div className="flex items-center gap-2 border-b border-parchment-shadow pb-2">
           <Sparkles className="w-5 h-5 text-gold-deep" />
-          <h2 className="font-pirate text-lg sm:text-xl text-ink">Format de la Traversée</h2>
+          <h2 className="font-pirate text-lg sm:text-xl text-ink">Manches</h2>
         </div>
 
         <div className="space-y-2">

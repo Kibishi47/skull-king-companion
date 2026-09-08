@@ -6,7 +6,8 @@ import { RoundRecap } from './components/RoundRecap';
 import { GameOverPodium } from './components/GameOverPodium';
 import { ScoreboardModal } from './components/ScoreboardModal';
 import { SkullKingLogo } from './components/SkullKingLogo';
-import { Trophy, RotateCcw, PlusCircle, History } from 'lucide-react';
+import { Trophy, History, Home, AlertCircle } from 'lucide-react';
+import { ButtonPirate } from './components/ParchmentUI';
 
 export function App() {
   const {
@@ -24,65 +25,33 @@ export function App() {
 
   const [isScoreboardOpen, setIsScoreboardOpen] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-parchment-dark text-ink selection:bg-gold-light selection:text-ink-pure">
-      {/* Top Navigation Bar avec Safe Area iOS */}
+      {/* Top Navigation Bar Ultra-épurée avec Safe Area iOS */}
       <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur-md border-b-2 border-parchment-shadow px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-sm">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div
-            onClick={() => {
-              if (activeGame && confirm("Voulez-vous retourner au menu principal sans perdre votre partie ?")) {
-                // simple refresh or stay
-              }
-            }}
-            className="flex items-center gap-2.5 cursor-pointer"
-          >
-            <SkullKingLogo size={36} />
+          <div className="flex items-center gap-2.5">
+            <SkullKingLogo size={34} />
             <span className="font-pirate text-xl font-bold tracking-wider text-ink">
               Skull King
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {activeGame && (
-              <>
-                <button
-                  type="button"
-                  onClick={undoLastAction}
-                  disabled={!canUndo}
-                  title="Annuler (Undo)"
-                  className="p-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink disabled:opacity-40 hover:bg-parchment transition-colors"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsScoreboardOpen(true)}
-                  title="Grille de score"
-                  className="flex items-center gap-1 text-xs font-display font-bold px-3 py-2 rounded-lg bg-gold-dark text-ink-pure shadow-sm hover:brightness-105 transition-all"
-                >
-                  <Trophy className="w-4 h-4" />
-                  <span className="hidden sm:inline">Tableau</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm("Commencer une nouvelle partie ? L'actuelle sera abandonnée.")) {
-                      resetGame();
-                    }
-                  }}
-                  title="Nouvelle partie"
-                  className="p-2 rounded-lg bg-parchment-light border border-parchment-shadow text-wax hover:bg-parchment transition-colors"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            {!activeGame && gameHistory.length > 0 && (
+          <div>
+            {activeGame ? (
+              <button
+                type="button"
+                onClick={() => setShowQuitConfirm(true)}
+                title="Quitter la partie"
+                aria-label="Quitter / Menu principal"
+                className="flex items-center gap-1.5 text-xs font-display font-bold px-3 py-2 rounded-lg bg-parchment-light border border-parchment-shadow text-ink hover:bg-parchment transition-colors"
+              >
+                <Home className="w-4 h-4 text-wax" />
+                <span className="hidden sm:inline">Menu</span>
+              </button>
+            ) : gameHistory.length > 0 ? (
               <button
                 type="button"
                 onClick={() => setShowHistoryModal(true)}
@@ -91,7 +60,7 @@ export function App() {
                 <History className="w-4 h-4 text-gold-deep" />
                 <span>Archives ({gameHistory.length})</span>
               </button>
-            )}
+            ) : null}
           </div>
         </div>
       </header>
@@ -190,6 +159,54 @@ export function App() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      {/* Modale de confirmation Quitter la partie */}
+      {showQuitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
+          <div className="bg-parchment-light max-w-sm w-full rounded-2xl border-4 border-gold-dark p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 border-b border-parchment-shadow pb-3">
+              <div className="p-2 rounded-full bg-wax-light/20 text-wax">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-pirate text-lg text-ink font-bold">
+                  Quitter la partie ?
+                </h3>
+                <p className="text-xs text-ink-light">
+                  Vos données restent sauvegardées
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-ink-light font-sans">
+              Vous pouvez revenir à tout moment au menu principal. Votre partie en cours ne sera pas perdue.
+            </p>
+
+            <div className="flex gap-2 pt-2">
+              <ButtonPirate
+                type="button"
+                onClick={() => setShowQuitConfirm(false)}
+                variant="ghost"
+                size="sm"
+                className="flex-1"
+              >
+                Continuer
+              </ButtonPirate>
+
+              <ButtonPirate
+                type="button"
+                onClick={() => {
+                  setShowQuitConfirm(false);
+                  resetGame();
+                }}
+                variant="wax"
+                size="sm"
+                className="flex-1"
+              >
+                Quitter
+              </ButtonPirate>
             </div>
           </div>
         </div>

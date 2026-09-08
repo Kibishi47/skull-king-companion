@@ -132,7 +132,7 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
           className="gap-1.5"
         >
           <RotateCcw className="w-4 h-4" />
-          <span>Annuler (Undo)</span>
+          <span>Annuler la manche</span>
         </ButtonPirate>
 
         <ButtonPirate
