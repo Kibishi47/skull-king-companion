@@ -1,70 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState, PlayerRoundInput, RascalOption } from '../types/game';
 import { ParchmentCard, ButtonPirate } from './ParchmentUI';
 import { BonusDrawer } from './BonusDrawer';
 import { calculateBonusScore, createEmptyBonuses } from '../utils/scoring';
 import { SkullKingLogo } from './SkullKingLogo';
-import { Crown, AlertTriangle, Gem, Swords, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Crown, AlertTriangle, Gem, Swords, ArrowRight, ArrowLeft, Pencil, X } from 'lucide-react';
 
 interface RoundEntryProps {
   gameState: GameState;
+  roundIndex?: number; // Index de la manche à afficher/saisir (défaut: currentRoundIndex)
+  isEditing?: boolean; // Mode édition dédié
+  onCancelEdit?: () => void;
   onSubmitRound: (inputs: PlayerRoundInput[]) => void;
   onOpenScoreboard: () => void;
 }
 
-export const RoundEntry: React.FC<RoundEntryProps> = ({
-  gameState,
-  onSubmitRound,
-  onOpenScoreboard,
-}) => {
-  const currentRound = gameState.rounds[gameState.currentRoundIndex];
-  const cardCount = currentRound.cardCount;
-  const isRascal = gameState.settings.mode === 'rascal';
+// Fonction utilitaire pour cloner profondément les inputs de manche
+function buildInputsForRound(
+  round: import('../types/game').Round,
+  players: import('../types/game').Player[]
+): Record<string, PlayerRoundInput> {
+  const init: Record<string, PlayerRoundInput> = {};
 
-  // Étape locale dans la saisie de la manche : 
-  // Si le statut du jeu est 'tricks', démarrer directement sur 'tricks', sinon 'bidding'
-  const [step, setStep] = useState<'bidding' | 'tricks'>(() => {
-    return gameState.status === 'tricks' ? 'tricks' : 'bidding';
-  });
-
-  // État des saisies pour chaque joueur (conservation absolue des saisies)
-  const [inputs, setInputs] = useState<Record<string, PlayerRoundInput>>(() => {
-    const init: Record<string, PlayerRoundInput> = {};
-
-    // 1. Vérifier si des saisies existaient déjà dans la manche actuelle (via lastInputs)
-    if (currentRound.lastInputs && currentRound.lastInputs.length > 0) {
-      currentRound.lastInputs.forEach((item) => {
-        init[item.playerId] = { ...item };
-      });
-      return init;
-    }
-
-    // 2. Vérifier si des scores existaient déjà
-    if (currentRound.playerScores && currentRound.playerScores.length > 0) {
-      currentRound.playerScores.forEach((score) => {
-        init[score.playerId] = {
-          playerId: score.playerId,
-          bid: score.bid,
-          tricks: score.tricks,
+  // 1. Si la manche a des lastInputs enregistrés (données de saisie complètes)
+  if (round.lastInputs && round.lastInputs.length > 0) {
+    round.lastInputs.forEach((item) => {
+      init[item.playerId] = {
+        playerId: item.playerId,
+        bid: item.bid,
+        tricks: item.tricks,
+        bonuses: { ...item.bonuses },
+        rascalOption: item.rascalOption || 'buckshot',
+      };
+    });
+    // Vérifier que tous les joueurs sont présents
+    players.forEach((p) => {
+      if (!init[p.id]) {
+        init[p.id] = {
+          playerId: p.id,
+          bid: 0,
+          tricks: 0,
           bonuses: createEmptyBonuses(),
           rascalOption: 'buckshot',
         };
-      });
-      return init;
-    }
+      }
+    });
+    return init;
+  }
 
-    // 3. Sinon, initialisation par défaut
-    gameState.players.forEach((p) => {
-      init[p.id] = {
-        playerId: p.id,
-        bid: 0,
-        tricks: 0,
+  // 2. Si la manche a des playerScores enregistrés
+  if (round.playerScores && round.playerScores.length > 0) {
+    round.playerScores.forEach((score) => {
+      init[score.playerId] = {
+        playerId: score.playerId,
+        bid: score.bid,
+        tricks: score.tricks,
         bonuses: createEmptyBonuses(),
         rascalOption: 'buckshot',
       };
     });
+    players.forEach((p) => {
+      if (!init[p.id]) {
+        init[p.id] = {
+          playerId: p.id,
+          bid: 0,
+          tricks: 0,
+          bonuses: createEmptyBonuses(),
+          rascalOption: 'buckshot',
+        };
+      }
+    });
     return init;
+  }
+
+  // 3. Sinon, initialisation par défaut vierge
+  players.forEach((p) => {
+    init[p.id] = {
+      playerId: p.id,
+      bid: 0,
+      tricks: 0,
+      bonuses: createEmptyBonuses(),
+      rascalOption: 'buckshot',
+    };
   });
+  return init;
+}
+
+export const RoundEntry: React.FC<RoundEntryProps> = ({
+  gameState,
+  roundIndex,
+  isEditing = false,
+  onCancelEdit,
+  onSubmitRound,
+  onOpenScoreboard,
+}) => {
+  const targetRoundIndex = roundIndex !== undefined ? roundIndex : gameState.currentRoundIndex;
+  const currentRound = gameState.rounds[targetRoundIndex];
+  const cardCount = currentRound.cardCount;
+  const isRascal = gameState.settings.mode === 'rascal';
+
+  // Étape locale :
+  // En mode édition ou si tricks, on peut commencer directement sur 'tricks'
+  const [step, setStep] = useState<'bidding' | 'tricks'>(() => {
+    return isEditing || gameState.status === 'tricks' ? 'tricks' : 'bidding';
+  });
+
+  // État local des inputs, strictement et profondément synchronisé dès que targetRoundIndex change
+  const [inputs, setInputs] = useState<Record<string, PlayerRoundInput>>(() => {
+    return buildInputsForRound(currentRound, gameState.players);
+  });
+
+  // Réinitialiser/synchroniser si la manche cible change
+  useEffect(() => {
+    setInputs(buildInputsForRound(currentRound, gameState.players));
+    setStep(isEditing || gameState.status === 'tricks' ? 'tricks' : 'bidding');
+  }, [targetRoundIndex, currentRound, gameState.players, isEditing, gameState.status]);
 
   // Drawer de bonus
   const [activeBonusPlayerId, setActiveBonusPlayerId] = useState<string | null>(null);
@@ -104,9 +154,6 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
   const totalBids = Object.values(inputs).reduce((sum, item) => sum + item.bid, 0);
   const totalTricks = Object.values(inputs).reduce((sum, item) => sum + item.tricks, 0);
 
-  const isBidsEqualToCards = totalBids === cardCount;
-  const isTricksNotEqualToCards = totalTricks !== cardCount;
-
   const handleFinishRound = () => {
     const roundInputsList = gameState.players.map((p) => inputs[p.id]);
     onSubmitRound(roundInputsList);
@@ -114,6 +161,33 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
 
   return (
     <div className="max-w-2xl mx-auto space-y-5 pb-16">
+      {/* Bandeau distinctif en mode édition */}
+      {isEditing && (
+        <div className="bg-wax text-parchment-light px-4 py-3 rounded-xl border-2 border-wax-border shadow-md flex items-center justify-between animate-fade-in">
+          <div className="flex items-center gap-2">
+            <Pencil className="w-5 h-5 text-gold animate-bounce" />
+            <div>
+              <h3 className="font-pirate text-base sm:text-lg font-bold">
+                Modification de la Manche {currentRound.roundNumber}
+              </h3>
+              <p className="text-xs text-parchment-light/80 font-sans">
+                Modifiez les plis ou bonus • Recalcul automatique en cascade
+              </p>
+            </div>
+          </div>
+          {onCancelEdit && (
+            <button
+              type="button"
+              onClick={onCancelEdit}
+              className="flex items-center gap-1 bg-black/20 hover:bg-black/40 text-xs font-display font-bold px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+              <span>Annuler</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Barre d'en-tête de la manche */}
       <div className="flex items-center justify-between bg-parchment-light border-2 border-parchment-deep rounded-xl p-3 shadow-md">
         <div className="flex items-center gap-2.5">
@@ -127,9 +201,27 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                 {cardCount} {cardCount > 1 ? 'cartes' : 'carte'}
               </span>
             </div>
-            <p className="text-xs text-ink-light">
-              {step === 'bidding' ? 'Mises' : 'Plis & Bonus'}
-            </p>
+            <div className="flex items-center gap-2 text-xs text-ink-light mt-0.5">
+              <button
+                type="button"
+                onClick={() => setStep('bidding')}
+                className={`font-semibold hover:underline ${
+                  step === 'bidding' ? 'text-wax font-extrabold underline' : ''
+                }`}
+              >
+                1. Mises
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => setStep('tricks')}
+                className={`font-semibold hover:underline ${
+                  step === 'tricks' ? 'text-wax font-extrabold underline' : ''
+                }`}
+              >
+                2. Plis & Bonus
+              </button>
+            </div>
           </div>
         </div>
 
@@ -191,7 +283,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     ))}
                   </div>
 
-                  {/* Sélecteur Variante Rascal individuel (Chevrotine vs Boulet de canon) */}
+                  {/* Sélecteur Variante Rascal individuel */}
                   {isRascal && (
                     <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-parchment-deep text-xs">
                       <span className="text-ink-faded font-bold">Option Rascal :</span>
@@ -233,7 +325,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             size="lg"
             className="w-full gap-2 shadow-xl whitespace-nowrap"
           >
-            <span>Saisir les plis</span>
+            <span>Passer aux plis</span>
             <ArrowRight className="w-5 h-5" />
           </ButtonPirate>
         </div>
@@ -249,66 +341,64 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                 ? 'bg-emerald-50/80 border-emerald-600 text-emerald-900'
                 : totalTricks < cardCount
                 ? 'bg-amber-50/80 border-amber-500 text-amber-900'
-                : 'bg-wax-light/20 border-wax text-wax-border'
+                : 'bg-rose-50/80 border-rose-600 text-rose-900'
             }`}
           >
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm sm:text-base">Plis saisis :</span>
-              <span className="font-mono font-black text-base sm:text-lg">
-                {totalTricks} / {cardCount}
+              {totalTricks !== cardCount && <AlertTriangle className="w-5 h-5 shrink-0" />}
+              <span className="font-bold text-sm">
+                Total des plis réalisés :{' '}
+                <span className="font-mono text-base font-black underline">{totalTricks}</span> / {cardCount}
               </span>
             </div>
-
-            <div className="text-xs sm:text-sm font-bold">
-              {totalTricks === cardCount && (
-                <span className="text-emerald-700 font-bold">Compte exact</span>
-              )}
-              {totalTricks < cardCount && (
-                <span className="text-amber-700">
-                  {cardCount - totalTricks} pli{cardCount - totalTricks > 1 ? 's' : ''} manquant{cardCount - totalTricks > 1 ? 's' : ''}
-                </span>
-              )}
-              {totalTricks > cardCount && (
-                <span className="text-wax font-bold">
-                  +{totalTricks - cardCount} pli{totalTricks - cardCount > 1 ? 's' : ''} en trop
-                </span>
-              )}
-            </div>
+            <span className="text-xs font-semibold">
+              {totalTricks === cardCount
+                ? 'Compte exact'
+                : totalTricks < cardCount
+                ? `Il manque ${cardCount - totalTricks} pli(s)`
+                : `${totalTricks - cardCount} pli(s) en trop`}
+            </span>
           </div>
 
           <div className="space-y-3">
             {gameState.players.map((player) => {
-              const currentInput = inputs[player.id];
-              const bid = currentInput?.bid || 0;
-              const tricks = currentInput?.tricks || 0;
-              const bonusScore = calculateBonusScore(currentInput?.bonuses || createEmptyBonuses());
-              const isMatch = bid === tricks;
+              const currentInput = inputs[player.id] || {
+                playerId: player.id,
+                bid: 0,
+                tricks: 0,
+                bonuses: createEmptyBonuses(),
+              };
+              const currentTricks = currentInput.tricks;
+              const bonusScore = calculateBonusScore(currentInput.bonuses);
 
               return (
-                <ParchmentCard key={player.id} variant="light" className="p-3.5 space-y-2">
-                  <div className="flex items-center justify-between">
+                <ParchmentCard key={player.id} variant="light" className="p-3.5">
+                  <div className="flex items-center justify-between mb-2">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-display font-extrabold text-ink text-base sm:text-lg">
-                          {player.name}
-                        </span>
-                        <span className="text-xs bg-parchment-deep text-ink-pure px-2 py-0.5 rounded font-bold">
-                          Mise : {bid}
-                        </span>
-                      </div>
+                      <span className="font-display font-extrabold text-ink text-base sm:text-lg">
+                        {player.name}
+                      </span>
+                      <span className="text-xs text-ink-light ml-2 font-mono">
+                        (Mise annoncée : <strong>{currentInput.bid}</strong>)
+                      </span>
                     </div>
 
+                    {/* Bouton pour ouvrir le tiroir des Bonus */}
                     <button
                       type="button"
                       onClick={() => setActiveBonusPlayerId(player.id)}
-                      className="flex items-center gap-1.5 text-xs font-bold text-gold-deep bg-parchment border border-gold-dark/40 px-2.5 py-1.5 rounded-lg hover:bg-gold-light/20 transition-all"
+                      className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border transition-all ${
+                        bonusScore > 0
+                          ? 'gold-gradient text-ink-pure border-gold-dark font-black shadow-xs'
+                          : 'bg-parchment text-ink-light border-parchment-shadow hover:bg-parchment-deep'
+                      }`}
                     >
                       <Gem className="w-3.5 h-3.5" />
-                      <span>Bonus {bonusScore > 0 ? `+${bonusScore}` : ''}</span>
+                      <span>{bonusScore > 0 ? `+${bonusScore} bonus` : 'Bonus'}</span>
                     </button>
                   </div>
 
-                  {/* Saisie rapide des plis remportés */}
+                  {/* Pavé tactile pour les plis */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {Array.from({ length: cardCount + 1 }).map((_, n) => (
                       <button
@@ -316,10 +406,8 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                         type="button"
                         onClick={() => updateTricks(player.id, n)}
                         className={`min-w-[40px] flex-1 py-2 rounded-lg font-bold text-sm sm:text-base transition-all ${
-                          tricks === n
-                            ? isMatch
-                              ? 'bg-emerald-700 text-white ring-2 ring-emerald-900 shadow-md font-extrabold'
-                              : 'bg-wax text-white ring-2 ring-wax-border shadow-md'
+                          currentTricks === n
+                            ? 'bg-pirate-wood text-parchment-light ring-2 ring-gold shadow-md font-extrabold'
                             : 'bg-parchment text-ink border border-parchment-shadow hover:bg-parchment-dark'
                         }`}
                       >
@@ -342,7 +430,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
             >
               <ArrowLeft className="w-4 h-4 shrink-0" />
-              <span className="truncate">Corriger mises</span>
+              <span className="truncate">Modifier mises</span>
             </ButtonPirate>
 
             <ButtonPirate
@@ -355,7 +443,11 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             >
               <Swords className="w-5 h-5 shrink-0" />
               <span className="truncate">
-                {totalTricks === cardCount ? 'Valider la manche' : `Plis requis : ${totalTricks} / ${cardCount}`}
+                {totalTricks === cardCount
+                  ? isEditing
+                    ? 'Enregistrer les modifications'
+                    : 'Valider la manche'
+                  : `Plis requis : ${totalTricks} / ${cardCount}`}
               </span>
             </ButtonPirate>
           </div>
