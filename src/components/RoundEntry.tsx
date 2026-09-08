@@ -21,12 +21,39 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
   const cardCount = currentRound.cardCount;
   const isRascal = gameState.settings.mode === 'rascal';
 
-  // Étape locale dans la saisie de la manche : 1 = 'bidding' (mises), 2 = 'tricks' (plis & bonus)
-  const [step, setStep] = useState<'bidding' | 'tricks'>('bidding');
+  // Étape locale dans la saisie de la manche : 
+  // Si le statut du jeu est 'tricks', démarrer directement sur 'tricks', sinon 'bidding'
+  const [step, setStep] = useState<'bidding' | 'tricks'>(() => {
+    return gameState.status === 'tricks' ? 'tricks' : 'bidding';
+  });
 
-  // État des saisies pour chaque joueur
+  // État des saisies pour chaque joueur (conservation absolue des saisies)
   const [inputs, setInputs] = useState<Record<string, PlayerRoundInput>>(() => {
     const init: Record<string, PlayerRoundInput> = {};
+
+    // 1. Vérifier si des saisies existaient déjà dans la manche actuelle (via lastInputs)
+    if (currentRound.lastInputs && currentRound.lastInputs.length > 0) {
+      currentRound.lastInputs.forEach((item) => {
+        init[item.playerId] = { ...item };
+      });
+      return init;
+    }
+
+    // 2. Vérifier si des scores existaient déjà
+    if (currentRound.playerScores && currentRound.playerScores.length > 0) {
+      currentRound.playerScores.forEach((score) => {
+        init[score.playerId] = {
+          playerId: score.playerId,
+          bid: score.bid,
+          tricks: score.tricks,
+          bonuses: createEmptyBonuses(),
+          rascalOption: 'buckshot',
+        };
+      });
+      return init;
+    }
+
+    // 3. Sinon, initialisation par défaut
     gameState.players.forEach((p) => {
       init[p.id] = {
         playerId: p.id,
@@ -101,7 +128,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               </span>
             </div>
             <p className="text-xs text-ink-light">
-              {step === 'bidding' ? 'Saisie des prédictions (Mises)' : 'Comptage des plis & butins'}
+              {step === 'bidding' ? 'Mises' : 'Plis & Bonus'}
             </p>
           </div>
         </div>
@@ -118,16 +145,6 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
       {/* Étape 1 : Saisie des Mises (Bidding) */}
       {step === 'bidding' && (
         <div className="space-y-4 animate-fade-in">
-          {/* Notification informative si somme des mises = nb de cartes */}
-          {isBidsEqualToCards && (
-            <div className="flex items-center gap-2 bg-gold/20 border border-gold-dark text-ink-pure px-3.5 py-2 rounded-lg text-xs sm:text-sm">
-              <AlertTriangle className="w-4 h-4 text-gold-deep shrink-0" />
-              <span>
-                Attention : la somme des mises ({totalBids}) équivaut exactement au nombre de cartes ({cardCount}) ! Tout le monde peut théoriquement réussir.
-              </span>
-            </div>
-          )}
-
           <div className="space-y-3">
             {gameState.players.map((player) => {
               const isDealer = player.id === currentRound.dealerPlayerId;
@@ -225,16 +242,39 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
       {/* Étape 2 : Saisie des Plis & Trésors/Bonus */}
       {step === 'tricks' && (
         <div className="space-y-4 animate-fade-in">
-          {/* Avertissement plis != cartes (non bloquant car Kraken possible) */}
-          {isTricksNotEqualToCards && (
-            <div className="flex items-center gap-2 bg-parchment-dark border border-wax text-ink px-3.5 py-2.5 rounded-lg text-xs sm:text-sm">
-              <AlertTriangle className="w-4 h-4 text-wax shrink-0" />
-              <span>
-                Total des plis : <strong>{totalTricks}</strong> / <strong>{cardCount}</strong> cartes en jeu.{' '}
-                {totalTricks < cardCount && "(Un Kraken a peut-être dévoré un pli !)"}
+          {/* Indicateur clair du compte des plis avec contrôle d'intégrité */}
+          <div
+            className={`flex items-center justify-between p-3 rounded-lg border-2 font-display ${
+              totalTricks === cardCount
+                ? 'bg-emerald-50/80 border-emerald-600 text-emerald-900'
+                : totalTricks < cardCount
+                ? 'bg-amber-50/80 border-amber-500 text-amber-900'
+                : 'bg-wax-light/20 border-wax text-wax-border'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-sm sm:text-base">Plis saisis :</span>
+              <span className="font-mono font-black text-base sm:text-lg">
+                {totalTricks} / {cardCount}
               </span>
             </div>
-          )}
+
+            <div className="text-xs sm:text-sm font-bold">
+              {totalTricks === cardCount && (
+                <span className="text-emerald-700 font-bold">Compte exact</span>
+              )}
+              {totalTricks < cardCount && (
+                <span className="text-amber-700">
+                  {cardCount - totalTricks} pli{cardCount - totalTricks > 1 ? 's' : ''} manquant{cardCount - totalTricks > 1 ? 's' : ''}
+                </span>
+              )}
+              {totalTricks > cardCount && (
+                <span className="text-wax font-bold">
+                  +{totalTricks - cardCount} pli{totalTricks - cardCount > 1 ? 's' : ''} en trop
+                </span>
+              )}
+            </div>
+          </div>
 
           <div className="space-y-3">
             {gameState.players.map((player) => {
@@ -264,7 +304,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                       className="flex items-center gap-1.5 text-xs font-bold text-gold-deep bg-parchment border border-gold-dark/40 px-2.5 py-1.5 rounded-lg hover:bg-gold-light/20 transition-all"
                     >
                       <Gem className="w-3.5 h-3.5" />
-                      <span>Bonus {bonusScore > 0 ? `(+${bonusScore})` : ''}</span>
+                      <span>Bonus {bonusScore > 0 ? `+${bonusScore}` : ''}</span>
                     </button>
                   </div>
 
@@ -292,7 +332,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             })}
           </div>
 
-          {/* Boutons d'action */}
+          {/* Boutons d'action avec validation bloquante */}
           <div className="flex gap-2.5 pt-2">
             <ButtonPirate
               type="button"
@@ -308,12 +348,15 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             <ButtonPirate
               type="button"
               onClick={handleFinishRound}
+              disabled={totalTricks !== cardCount}
               variant="wax"
               size="lg"
-              className="flex-1 gap-2 shadow-xl"
+              className="flex-1 gap-2 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Swords className="w-5 h-5" />
-              <span>Valider la Manche</span>
+              <span>
+                {totalTricks === cardCount ? 'Valider la Manche' : `Plis incorrects (${totalTricks}/${cardCount})`}
+              </span>
             </ButtonPirate>
           </div>
         </div>
