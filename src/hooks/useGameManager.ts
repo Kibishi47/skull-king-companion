@@ -73,7 +73,7 @@ export function useGameManager() {
   const startNewGame = useCallback((playerNames: string[], gameSettings: GameSettings) => {
     const players: Player[] = playerNames.map((name, index) => ({
       id: `p-${Date.now()}-${index}`,
-      name: name.trim() || `Pirate ${index + 1}`,
+      name: name.trim(),
     }));
 
     // Sauvegarder les noms de joueurs pour réutilisation future

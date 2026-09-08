@@ -94,6 +94,10 @@ export const GameSetup: React.FC<GameSetupProps> = ({
     setCustomRounds(customRounds.filter((_, i) => i !== index));
   };
 
+  // Validation : au moins 2 joueurs et AUCUN nom vide
+  const isPlayersConfigValid =
+    playerInputs.length >= 2 && playerInputs.every((p) => p.trim().length > 0);
+
   // Validation pour le mode personnalisé : chaque manche doit avoir un nombre valide entre 1 et 10
   const isCustomConfigValid =
     settings.presetId !== 'custom' ||
@@ -103,11 +107,13 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         return !isNaN(num) && num >= 1 && num <= 10;
       }));
 
-  const handleStart = () => {
-    if (!isCustomConfigValid) return;
+  const canStartGame = isPlayersConfigValid && isCustomConfigValid;
 
-    // Résolution des noms : nom saisi ou fallback "Joueur X" sobre
-    const finalPlayerNames = playerInputs.map((p, idx) => p.trim() || `Joueur ${idx + 1}`);
+  const handleStart = () => {
+    if (!canStartGame) return;
+
+    // Noms stricts saisis par l'utilisateur (zéro fallback "Joueur X")
+    const finalPlayerNames = playerInputs.map((p) => p.trim());
 
     const finalCardCounts =
       settings.presetId === 'custom'
@@ -148,57 +154,72 @@ export const GameSetup: React.FC<GameSetupProps> = ({
 
         {/* Liste des champs de saisie pour chaque joueur */}
         <div className="space-y-2.5">
-          {playerInputs.map((name, idx) => (
-            <div key={idx} className="flex items-center gap-1.5">
-              <span className="w-7 h-7 rounded-full bg-pirate-wood text-gold text-xs flex items-center justify-center font-bold shrink-0">
-                {idx + 1}
-              </span>
+          {playerInputs.map((name, idx) => {
+            const isBlank = !name.trim();
+            const hasStartedFilling = playerInputs.some((p) => p.trim().length > 0);
+            return (
+              <div key={idx} className="flex items-center gap-1.5">
+                <span className="w-7 h-7 rounded-full bg-pirate-wood text-gold text-xs flex items-center justify-center font-bold shrink-0">
+                  {idx + 1}
+                </span>
 
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => handlePlayerInputChange(idx, e.target.value)}
-                placeholder={`Joueur ${idx + 1}`}
-                maxLength={20}
-                className="flex-1 bg-white/90 border-2 border-parchment-deep rounded-lg px-3 py-2 text-ink text-base focus:outline-none focus:border-gold-deep"
-              />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => handlePlayerInputChange(idx, e.target.value)}
+                  placeholder={`Prénom du joueur ${idx + 1}`}
+                  maxLength={20}
+                  className={`flex-1 bg-white/90 border-2 rounded-lg px-3 py-2 text-ink text-base focus:outline-none transition-colors ${
+                    isBlank && hasStartedFilling
+                      ? 'border-wax ring-1 ring-wax/40 focus:border-wax'
+                      : 'border-parchment-deep focus:border-gold-deep'
+                  }`}
+                />
 
-              <div className="flex flex-col gap-0.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => handleMovePlayerUp(idx)}
-                  disabled={idx === 0}
-                  className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
-                  aria-label={`Monter le joueur ${idx + 1}`}
-                  title="Monter"
-                >
-                  <ChevronUp className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMovePlayerDown(idx)}
-                  disabled={idx === playerInputs.length - 1}
-                  className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
-                  aria-label={`Descendre le joueur ${idx + 1}`}
-                  title="Descendre"
-                >
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex flex-col gap-0.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleMovePlayerUp(idx)}
+                    disabled={idx === 0}
+                    className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                    aria-label={`Monter le joueur ${idx + 1}`}
+                    title="Monter"
+                  >
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleMovePlayerDown(idx)}
+                    disabled={idx === playerInputs.length - 1}
+                    className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                    aria-label={`Descendre le joueur ${idx + 1}`}
+                    title="Descendre"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {playerInputs.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePlayerField(idx)}
+                    className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors shrink-0"
+                    aria-label={`Supprimer le joueur ${idx + 1}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
-
-              {playerInputs.length > 2 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemovePlayerField(idx)}
-                  className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors shrink-0"
-                  aria-label={`Supprimer le joueur ${idx + 1}`}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
+
+        {/* Message d'aide sous les joueurs si des champs sont vides */}
+        {!isPlayersConfigValid && (
+          <p className="text-xs text-wax font-medium">
+            Veuillez renseigner un prénom pour chaque joueur (aucun champ vide).
+          </p>
+        )}
 
         {/* Actions sous la liste des joueurs */}
         <div className="flex flex-col sm:flex-row gap-2 pt-1 w-full box-border">
@@ -398,18 +419,17 @@ export const GameSetup: React.FC<GameSetupProps> = ({
 
       {/* Bouton de démarrage de la partie */}
       <div className="sticky bottom-4 pt-2">
+
         <ButtonPirate
           type="button"
           onClick={handleStart}
-          disabled={!isCustomConfigValid}
+          disabled={!canStartGame}
           variant="wax"
           size="lg"
           className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Swords className="w-5 h-5" />
-          <span>
-            {isCustomConfigValid ? 'Démarrer la partie' : 'Configuration incomplète'}
-          </span>
+          <Swords className="w-5 h-5 shrink-0" />
+          <span>Démarrer la partie</span>
         </ButtonPirate>
       </div>
     </div>
