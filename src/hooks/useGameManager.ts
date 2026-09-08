@@ -1,0 +1,194 @@
+import { useState, useCallback } from 'react';
+import { GameState, Player, GameSettings, PlayerRoundInput, Round } from '../types/game';
+import { useLocalStorage } from './useLocalStorage';
+import { calculatePlayerScore, createEmptyBonuses } from '../utils/scoring';
+import { ROUND_PRESETS } from '../utils/presets';
+
+const STORAGE_KEYS = {
+  ACTIVE_GAME: 'skullking_active_game',
+  HISTORY: 'skullking_history',
+  SAVED_PLAYERS: 'skullking_saved_players',
+  SETTINGS: 'skullking_settings',
+};
+
+const DEFAULT_SETTINGS: GameSettings = {
+  mode: 'classic',
+  defaultRascalOption: 'buckshot',
+  presetId: 'standard',
+};
+
+export function useGameManager() {
+  const [activeGame, setActiveGame] = useLocalStorage<GameState | null>(STORAGE_KEYS.ACTIVE_GAME, null);
+  const [gameHistory, setGameHistory] = useLocalStorage<GameState[]>(STORAGE_KEYS.HISTORY, []);
+  const [savedPlayers, setSavedPlayers] = useLocalStorage<string[]>(STORAGE_KEYS.SAVED_PLAYERS, [
+    'Jack', 'Barbe Noire', 'Anne Bonny', 'Mary Read'
+  ]);
+  const [settings, setSettings] = useLocalStorage<GameSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+
+  // Pile d'historique (snapshots) pour Undo/Redo au sein de la partie active
+  const [historySnapshots, setHistorySnapshots] = useState<GameState[]>([]);
+
+  const pushSnapshot = useCallback((state: GameState) => {
+    setHistorySnapshots((prev) => [...prev.slice(-19), JSON.parse(JSON.stringify(state))]);
+  }, []);
+
+  /**
+   * Créer et démarrer une nouvelle partie
+   */
+  const startNewGame = useCallback((playerNames: string[], gameSettings: GameSettings) => {
+    const players: Player[] = playerNames.map((name, index) => ({
+      id: `p-${Date.now()}-${index}`,
+      name: name.trim() || `Pirate ${index + 1}`,
+    }));
+
+    // Sauvegarder les noms de joueurs pour réutilisation future
+    setSavedPlayers((prev) => {
+      const updated = Array.from(new Set([...prev, ...playerNames.map(p => p.trim())])).filter(Boolean);
+      return updated.slice(0, 20);
+    });
+
+    const preset = ROUND_PRESETS.find(p => p.id === gameSettings.presetId) || ROUND_PRESETS[0];
+    const cardCounts = gameSettings.customCardCounts && gameSettings.presetId === 'custom'
+      ? gameSettings.customCardCounts
+      : preset.rounds;
+
+    const rounds: Round[] = cardCounts.map((count, index) => ({
+      roundNumber: index + 1,
+      cardCount: count,
+      dealerPlayerId: players[index % players.length].id,
+      playerScores: [],
+      isCompleted: false,
+    }));
+
+    const newGame: GameState = {
+      id: `game-${Date.now()}`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      players,
+      settings: gameSettings,
+      rounds,
+      currentRoundIndex: 0,
+      status: 'bidding',
+    };
+
+    setHistorySnapshots([]);
+    setActiveGame(newGame);
+    return newGame;
+  }, [setActiveGame, setSavedPlayers]);
+
+  /**
+   * Valider la saisie d'une manche complète
+   */
+  const submitRound = useCallback((roundInputs: PlayerRoundInput[]) => {
+    if (!activeGame) return;
+
+    pushSnapshot(activeGame);
+
+    const currentRound = activeGame.rounds[activeGame.currentRoundIndex];
+    const cardCount = currentRound.cardCount;
+    const isLastRound = activeGame.currentRoundIndex >= activeGame.rounds.length - 1;
+
+    // Calcul des scores pour chaque joueur
+    const playerScores = roundInputs.map((input) => {
+      // Trouver le score cumulé précédent du joueur
+      let previousCumulative = 0;
+      if (activeGame.currentRoundIndex > 0) {
+        const prevRound = activeGame.rounds[activeGame.currentRoundIndex - 1];
+        const prevScore = prevRound.playerScores.find(s => s.playerId === input.playerId);
+        if (prevScore) {
+          previousCumulative = prevScore.cumulativeTotal;
+        }
+      }
+
+      return calculatePlayerScore(input, cardCount, activeGame.settings.mode, previousCumulative);
+    });
+
+    const updatedRounds = [...activeGame.rounds];
+    updatedRounds[activeGame.currentRoundIndex] = {
+      ...currentRound,
+      playerScores,
+      isCompleted: true,
+    };
+
+    const nextRoundIndex = activeGame.currentRoundIndex + 1;
+    const nextStatus = isLastRound ? 'completed' : 'recap';
+
+    const updatedGame: GameState = {
+      ...activeGame,
+      rounds: updatedRounds,
+      currentRoundIndex: isLastRound ? activeGame.currentRoundIndex : nextRoundIndex,
+      status: nextStatus,
+      updatedAt: Date.now(),
+    };
+
+    setActiveGame(updatedGame);
+
+    // Si la partie est terminée, l'archiver dans l'historique
+    if (isLastRound) {
+      setGameHistory((prev) => [updatedGame, ...prev.slice(0, 29)]);
+    }
+  }, [activeGame, pushSnapshot, setActiveGame, setGameHistory]);
+
+  /**
+   * Passer de l'écran récapitulatif à la manche suivante
+   */
+  const proceedToNextRound = useCallback(() => {
+    if (!activeGame) return;
+    pushSnapshot(activeGame);
+    setActiveGame({
+      ...activeGame,
+      status: 'bidding',
+      updatedAt: Date.now(),
+    });
+  }, [activeGame, pushSnapshot, setActiveGame]);
+
+  /**
+   * Annuler la dernière action (Undo)
+   */
+  const undoLastAction = useCallback(() => {
+    if (historySnapshots.length === 0) return;
+    const lastSnapshot = historySnapshots[historySnapshots.length - 1];
+    setHistorySnapshots((prev) => prev.slice(0, -1));
+    setActiveGame(lastSnapshot);
+  }, [historySnapshots, setActiveGame]);
+
+  /**
+   * Recommencer une nouvelle manche / Modifier la manche en cours
+   */
+  const editCurrentRound = useCallback(() => {
+    if (!activeGame) return;
+    pushSnapshot(activeGame);
+    setActiveGame({
+      ...activeGame,
+      status: 'bidding',
+      updatedAt: Date.now(),
+    });
+  }, [activeGame, pushSnapshot, setActiveGame]);
+
+  /**
+   * Terminer ou réinitialiser la partie en cours
+   */
+  const resetGame = useCallback(() => {
+    if (activeGame) {
+      pushSnapshot(activeGame);
+    }
+    setActiveGame(null);
+  }, [activeGame, pushSnapshot, setActiveGame]);
+
+  return {
+    activeGame,
+    gameHistory,
+    savedPlayers,
+    setSavedPlayers,
+    settings,
+    setSettings,
+    canUndo: historySnapshots.length > 0,
+    startNewGame,
+    submitRound,
+    proceedToNextRound,
+    undoLastAction,
+    editCurrentRound,
+    resetGame,
+    createEmptyBonuses,
+  };
+}
