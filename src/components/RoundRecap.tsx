@@ -122,17 +122,17 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
       </div>
 
       {/* Barre d'actions : Undo et Prochaine manche */}
-      <div className="flex gap-2.5 pt-2">
+      <div className="grid grid-cols-2 gap-3 w-full max-w-md mx-auto pt-2 box-border">
         <ButtonPirate
           type="button"
           onClick={onUndo}
           disabled={!canUndo}
           variant="ghost"
           size="md"
-          className="gap-1.5 whitespace-nowrap"
+          className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
         >
-          <RotateCcw className="w-4 h-4" />
-          <span>Annuler manche</span>
+          <RotateCcw className="w-4 h-4 shrink-0" />
+          <span className="truncate">Annuler manche</span>
         </ButtonPirate>
 
         <ButtonPirate
@@ -140,10 +140,10 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
           onClick={onProceed}
           variant="wax"
           size="lg"
-          className="flex-1 gap-2 shadow-xl whitespace-nowrap"
+          className="w-full min-w-0 gap-2 shadow-xl whitespace-nowrap text-xs sm:text-base font-extrabold truncate"
         >
-          <span>Manche suivante</span>
-          <ArrowRight className="w-5 h-5" />
+          <span className="truncate">Manche suivante</span>
+          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
         </ButtonPirate>
       </div>
     </div>

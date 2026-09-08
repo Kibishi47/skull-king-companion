@@ -31,7 +31,7 @@ export function App() {
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-parchment-dark text-ink selection:bg-gold-light selection:text-ink-pure">
+    <div className="min-h-screen flex flex-col bg-parchment-dark text-ink selection:bg-gold-light selection:text-ink-pure overflow-x-hidden w-full">
       {/* Top Navigation Bar Ultra-épurée avec Safe Area iOS */}
       <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur-md border-b-2 border-parchment-shadow px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-sm">
         <div className="max-w-3xl mx-auto flex items-center justify-between">

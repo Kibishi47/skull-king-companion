@@ -333,16 +333,16 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
           </div>
 
           {/* Boutons d'action avec validation bloquante */}
-          <div className="flex gap-2.5 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
             <ButtonPirate
               type="button"
               onClick={() => setStep('bidding')}
               variant="ghost"
               size="md"
-              className="gap-1.5 whitespace-nowrap"
+              className="w-full min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm truncate"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Corriger mises</span>
+              <ArrowLeft className="w-4 h-4 shrink-0" />
+              <span className="truncate">Corriger mises</span>
             </ButtonPirate>
 
             <ButtonPirate
@@ -351,10 +351,10 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               disabled={totalTricks !== cardCount}
               variant="wax"
               size="lg"
-              className="flex-1 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              className="sm:col-span-2 w-full min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold truncate"
             >
-              <Swords className="w-5 h-5" />
-              <span>
+              <Swords className="w-5 h-5 shrink-0" />
+              <span className="truncate">
                 {totalTricks === cardCount ? 'Valider la manche' : `Plis requis : ${totalTricks} / ${cardCount}`}
               </span>
             </ButtonPirate>
