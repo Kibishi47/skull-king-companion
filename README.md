@@ -1,4 +1,7 @@
-# 🏴‍☠️ Skull King Companion
+<div align="center">
+  <img src="public/favicon.svg" alt="Skull King Logo" width="128" height="128" />
+  <h1>Skull King Companion</h1>
+  <p><strong>A modern, mobile-first, 100% offline PWA companion & scorekeeper for the legendary trick-taking card game <em>Skull King</em> (Grandpa Beck's Games).</strong></p>
 
 [![React](https://img.shields.io/badge/React-19.x-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -6,9 +9,14 @@
 [![Vite](https://img.shields.io/badge/Vite-6.x-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Alpine_Multi--stage-2496ed?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Coolify](https://img.shields.io/badge/Deploy-Coolify-6B21A8?style=for-the-badge&logo=rocket&logoColor=white)](https://coolify.io/)
+[![Language: French](https://img.shields.io/badge/Language-French%20%F0%9F%87%AB%F0%9F%87%B7-blue?style=for-the-badge)](https://github.com/Kibishi47/skull-king-companion)
 [![License](https://img.shields.io/badge/License-MIT-amber.svg?style=for-the-badge)](LICENSE)
 
-> **A modern, mobile-first, 100% offline Progressive Web App (PWA) companion & scorekeeper for the legendary trick-taking card game *Skull King* by Grandpa Beck's Games. Crafted with an authentic pirate parchment aesthetic to replace messy paper sheets at your gaming table.**
+</div>
+
+> **Crafted with an authentic pirate parchment aesthetic to replace messy paper sheets at your gaming table.**
+>
+> 🇫🇷 **Note on Language:** The user interface, terminology (*plis, mises, manches, bonus, etc.*), and game flow are **exclusively in French**, aligned with the official French edition rules and phrasing.
 
 ---
 
@@ -20,7 +28,7 @@ Anyone who has played **Skull King** knows the pain of paper scorekeeping:
 - Forgetting Rascal options, siren captures, or booty alliance bonuses.
 - Slowing down the electric rhythm of *“Yo-ho-ho!”* rounds.
 
-**Skull King Companion** solves all of this. Designed primarily for handheld smartphone use right beside the deck, it delivers instant bidirectional score computing, rock-solid integrity validation, non-destructive round corrections, and an authentic pirate score sheet replica.
+**Skull King Companion** solves all of this. Designed primarily for handheld smartphone use right beside the deck, it delivers instant bidirectional score computing, rock-solid integrity validation, non-destructive round corrections, and an authentic pirate score sheet replica (in French).
 
 ---
 
