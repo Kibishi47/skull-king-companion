@@ -48,11 +48,12 @@ Anyone who has played **Skull King** knows the pain of paper scorekeeping:
   - **Rascal Bets:** Additional risk/reward bonus points.
 
 ### 📱 Mobile-First & iOS PWA Experience
-- **Standalone App Mode:** Fullscreen web app with zero Safari browser chrome (`display: standalone`, custom theme colors, apple-touch-icons).
-- **Notch & Safe Area Aware:** Native padding dynamically adjusted using `env(safe-area-inset-*)`.
-- **Anti-Zoom Guard:** `touch-action: manipulation` and meta viewport restrictions prevent accidental iOS double-tap zooming during rapid tap input.
+- **Fully Installable PWA:** Installable on iOS Safari ("Add to Home Screen") and Android Chrome ("Install App") under the official name **Skull King Companion**.
+- **Standalone App Mode:** Fullscreen web app with zero browser chrome (`display: standalone`, custom theme `#c9933b`, dark aged leather background `#0a0f1d`, Apple touch icons).
+- **iOS Safari & Dynamic Island / Notch Aware:** Layout dynamically adheres to iOS safe areas using `env(safe-area-inset-top)`, `env(safe-area-inset-bottom)`, etc.
+- **Anti-Zoom Guard:** `touch-action: manipulation` and meta viewport restrictions (`user-scalable=no`, `viewport-fit=cover`) prevent accidental double-tap zooming during intense bidding rounds.
 - **Single-Line Action Bars:** Zero-wrapping (`whitespace-nowrap`) responsive buttons designed for thumb ergonomics.
-- **Minimalist Header:** Clean navigation featuring the custom vector Skull King logo and rapid home access.
+- **Minimalist Header & Vector Identity:** Clean navigation featuring the custom vector Skull King logo (transparent background, authentic crossbones with articulated rounded heads, subtle layer drop-shadows).
 
 ### 👥 Table & Player Roster Management
 - Supports **2 to 8 players**.
@@ -78,9 +79,9 @@ Choose your preferred voyage length or craft your own:
 1. **Leaderboard Tab (Default):** Instant standings with gold/silver/bronze badges, point differentials, and current rankings.
 2. **Matrix Score Grid Tab:** A faithful digital reproduction of the official physical scorecard showing individual round rows, slash notation (bid / won), and running cumulative totals.
 
-### 💾 100% Client-Side Local Storage
+### 💾 100% Client-Side Local Storage & Offline-First
 - Automatic game auto-save upon every action under `skull_king_active_game`.
-- Ability to pause, close the browser, and resume instantly.
+- Service Worker registration via `virtual:pwa-register` (`registerType: 'autoUpdate'`) caching all assets (`js`, `css`, `html`, `svg`, `png`, `woff2`) for full offline gameplay at the tavern or cabin.
 - Multi-game archive manager under `skull_king_saved_games` with timestamps and winner badges.
 
 ---
@@ -90,9 +91,12 @@ Choose your preferred voyage length or craft your own:
 ```text
 skull-king-companion/
 ├── public/                     # Static assets, PWA icons, manifest
-│   ├── favicon.svg             # Pirate skull favicon
-│   ├── icon-192.png            # PWA manifest icons
-│   └── icon-512.png
+│   ├── apple-touch-icon.png    # iOS Safari icon (180x180, solid aged leather background)
+│   ├── favicon.svg             # Transparent vector pirate skull & wheel favicon
+│   ├── icon-192.png            # Android PWA icon (192x192, maskable & standard)
+│   └── icon-512.png            # High-definition PWA icon (512x512, maskable & standard)
+├── scripts/
+│   └── generate-icons.cjs      # Automated macOS Cocoa/sips PWA icon builder
 ├── src/
 │   ├── components/             # React UI components
 │   │   ├── BonusDrawer.tsx     # Slide-over bottom sheet for round bonuses
@@ -104,7 +108,7 @@ skull-king-companion/
 │   │   ├── RoundRecap.tsx      # Inter-round scoreboard recap & edit triggers
 │   │   ├── SavedGamesModal.tsx # Historical games drawer
 │   │   ├── ScoreboardModal.tsx # Leaderboard & official matrix score sheet drawer
-│   │   └── SkullKingLogo.tsx   # Handcrafted pirate vector SVG logo
+│   │   └── SkullKingLogo.tsx   # Handcrafted transparent vector SVG logo with drop-shadow
 │   ├── hooks/
 │   │   └── useGameManager.ts   # Core game lifecycle, state transitions & persistence
 │   ├── types/
@@ -113,13 +117,14 @@ skull-king-companion/
 │   │   ├── presets.ts          # Official and custom round sequence presets
 │   │   ├── scoring.ts          # Pure scoring algorithms (Classic, Rascal, Zero-bids)
 │   │   └── scoring.test.ts     # Vitest unit test suite for scoring edge cases
-│   ├── App.tsx                 # Main root router & layout orchestrator
+│   ├── App.tsx                 # Main root router, safe area wrapper & layout
 │   ├── index.css               # Parchment styling tokens & Tailwind base directives
 │   └── main.tsx                # React 19 entry point & Service Worker registration
 ├── Dockerfile                  # Multi-stage production build (Alpine + Nginx)
 ├── nginx.conf                  # Nginx configuration (SPA routing, Gzip, cache policies)
 ├── tailwind.config.js          # Custom parchment, gold, and wax pirate color palette
-├── vite.config.ts              # Vite & VitePWA configuration
+├── tsconfig.app.json           # TypeScript config including vite-plugin-pwa/client types
+├── vite.config.ts              # Vite & VitePWA configuration (autoUpdate, manifest, Workbox)
 └── package.json
 ```
 
@@ -165,7 +170,12 @@ skull-king-companion/
    npm run lint         # Run Oxlint
    ```
 
-5. **Build for production:**
+5. **Generate PWA icons (optional):**
+   ```bash
+   node scripts/generate-icons.cjs   # Generates 512x512, 192x192, and apple-touch-icon
+   ```
+
+6. **Build for production:**
    ```bash
    npm run build
    npm run preview      # Preview compiled production build locally
