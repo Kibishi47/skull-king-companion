@@ -225,21 +225,21 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               const currentBid = inputs[player.id]?.bid || 0;
 
               return (
-                <ParchmentCard key={player.id} variant="light" className="p-3.5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display font-extrabold text-ink text-base sm:text-lg">
+                <ParchmentCard key={player.id} variant="light" className="p-4 shadow-sm border border-parchment-deep/60">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-display font-extrabold text-ink text-lg sm:text-xl truncate">
                         {player.name}
                       </span>
                       {isDealer && (
-                        <span className="inline-flex items-center gap-1 bg-wax text-parchment-light px-2 py-0.5 rounded text-[11px] font-bold">
-                          <Crown className="w-3 h-3" /> Donneur
+                        <span className="inline-flex items-center gap-1 bg-wax/90 text-parchment-light px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0">
+                          <Crown className="w-2.5 h-2.5" /> Donneur
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-ink-faded uppercase font-bold">Mise :</span>
-                      <span className="font-pirate text-xl text-wax font-black w-8 text-right">
+                    <div className="flex items-center gap-1.5 shrink-0 bg-parchment px-2.5 py-1 rounded-lg border border-parchment-shadow">
+                      <span className="text-[11px] text-ink-faded uppercase font-bold tracking-wider">Mise</span>
+                      <span className="font-pirate text-2xl text-wax font-black leading-none">
                         {currentBid}
                       </span>
                     </div>
@@ -391,30 +391,40 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
               const bonusScore = calculateBonusScore(currentInput.bonuses);
 
               return (
-                <ParchmentCard key={player.id} variant="light" className="p-3.5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="font-display font-extrabold text-ink text-base sm:text-lg">
+                <ParchmentCard key={player.id} variant="light" className="p-4 shadow-sm border border-parchment-deep/60">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-display font-extrabold text-ink text-lg sm:text-xl truncate">
                         {player.name}
                       </span>
-                      <span className="text-xs text-ink-light ml-2 font-mono">
-                        (Mise annoncée : <strong>{currentInput.bid}</strong>)
+                      <span className="text-xs text-ink-light font-mono px-2 py-0.5 rounded bg-parchment border border-parchment-shadow shrink-0">
+                        Mise: <strong>{currentInput.bid}</strong>
                       </span>
                     </div>
 
-                    {/* Bouton pour ouvrir le tiroir des Bonus */}
-                    <button
-                      type="button"
-                      onClick={() => setActiveBonusPlayerId(player.id)}
-                      className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border transition-all ${
-                        bonusScore > 0
-                          ? 'gold-gradient text-ink-pure border-gold-dark font-black shadow-xs'
-                          : 'bg-parchment text-ink-light border-parchment-shadow hover:bg-parchment-deep'
-                      }`}
-                    >
-                      <Gem className="w-3.5 h-3.5" />
-                      <span>{bonusScore > 0 ? `+${bonusScore} bonus` : 'Bonus'}</span>
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* Bouton pour ouvrir le tiroir des Bonus */}
+                      <button
+                        type="button"
+                        onClick={() => setActiveBonusPlayerId(player.id)}
+                        className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border active:scale-95 transition-all ${
+                          bonusScore > 0
+                            ? 'gold-gradient text-ink-pure border-gold-dark font-black shadow-xs'
+                            : 'bg-parchment text-ink-light border-parchment-shadow hover:bg-parchment-deep'
+                        }`}
+                      >
+                        <Gem className="w-3.5 h-3.5" />
+                        <span>{bonusScore > 0 ? `+${bonusScore}` : 'Bonus'}</span>
+                      </button>
+
+                      {/* Plis actuels */}
+                      <div className="flex items-center gap-1.5 bg-parchment px-2.5 py-1 rounded-lg border border-parchment-shadow">
+                        <span className="text-[11px] text-ink-faded uppercase font-bold tracking-wider">Plis</span>
+                        <span className="font-pirate text-2xl text-ink-pure font-black leading-none">
+                          {currentTricks}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Pavé tactile pour les plis : centré avec taille tactile généreuse (>= 48px) */}
