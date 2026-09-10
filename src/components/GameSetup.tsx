@@ -176,26 +176,26 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                   }`}
                 />
 
-                <div className="flex flex-col gap-0.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleMovePlayerUp(idx)}
                     disabled={idx === 0}
-                    className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-parchment/60 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
                     aria-label={`Monter le joueur ${idx + 1}`}
                     title="Monter"
                   >
-                    <ChevronUp className="w-3.5 h-3.5" />
+                    <ChevronUp className="w-5 h-5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleMovePlayerDown(idx)}
                     disabled={idx === playerInputs.length - 1}
-                    className="p-1 rounded text-ink-light hover:text-ink disabled:opacity-20 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-parchment/60 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
                     aria-label={`Descendre le joueur ${idx + 1}`}
                     title="Descendre"
                   >
-                    <ChevronDown className="w-3.5 h-3.5" />
+                    <ChevronDown className="w-5 h-5" />
                   </button>
                 </div>
 
@@ -203,8 +203,9 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                   <button
                     type="button"
                     onClick={() => handleRemovePlayerField(idx)}
-                    className="text-wax hover:text-wax-dark p-2 rounded-lg transition-colors shrink-0"
+                    className="w-10 h-10 flex items-center justify-center text-wax hover:text-wax-dark bg-wax/10 hover:bg-wax/20 rounded-lg active:scale-95 transition-all shrink-0"
                     aria-label={`Supprimer le joueur ${idx + 1}`}
+                    title="Supprimer le joueur"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

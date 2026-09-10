@@ -245,18 +245,18 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     </div>
                   </div>
 
-                  {/* Pavé tactile rapide de sélection de la mise : centré avec largeur fixe homogène */}
-                  <div className="flex flex-wrap justify-center gap-1.5 pt-1">
+                  {/* Pavé tactile rapide de sélection de la mise : centré avec largeur confortable (>= 48px) */}
+                  <div className="flex flex-wrap justify-center gap-2 pt-1">
                     {Array.from({ length: cardCount + 1 }).map((_, n) => (
                       <button
                         key={n}
                         type="button"
                         onClick={() => updateBid(player.id, n)}
-                        className={`w-11 h-11 flex items-center justify-center rounded-lg font-bold text-base transition-all shrink-0 ${
+                        className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-lg active:scale-95 transition-all shrink-0 ${
                           currentBid === n
                             ? n === 0
-                              ? 'bg-wax text-white ring-2 ring-wax-border shadow-md font-extrabold'
-                              : 'gold-gradient text-ink-pure ring-2 ring-gold-deep shadow-md font-extrabold'
+                              ? 'bg-wax text-white ring-2 ring-wax-border shadow-md font-extrabold scale-105'
+                              : 'gold-gradient text-ink-pure ring-2 ring-gold-deep shadow-md font-extrabold scale-105'
                             : 'bg-parchment text-ink border border-parchment-shadow hover:bg-parchment-dark'
                         }`}
                       >
@@ -417,16 +417,16 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     </button>
                   </div>
 
-                  {/* Pavé tactile pour les plis : centré avec largeur fixe homogène */}
-                  <div className="flex flex-wrap justify-center gap-1.5 pt-1">
+                  {/* Pavé tactile pour les plis : centré avec taille tactile généreuse (>= 48px) */}
+                  <div className="flex flex-wrap justify-center gap-2 pt-1">
                     {Array.from({ length: cardCount + 1 }).map((_, n) => (
                       <button
                         key={n}
                         type="button"
                         onClick={() => updateTricks(player.id, n)}
-                        className={`w-11 h-11 flex items-center justify-center rounded-lg font-bold text-base transition-all shrink-0 ${
+                        className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-lg active:scale-95 transition-all shrink-0 ${
                           currentTricks === n
-                            ? 'bg-pirate-wood text-parchment-light ring-2 ring-gold shadow-md font-extrabold'
+                            ? 'bg-pirate-wood text-parchment-light ring-2 ring-gold shadow-md font-extrabold scale-105'
                             : 'bg-parchment text-ink border border-parchment-shadow hover:bg-parchment-dark'
                         }`}
                       >
