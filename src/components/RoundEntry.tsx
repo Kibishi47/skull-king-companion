@@ -403,18 +403,21 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                      {/* Bouton pour ouvrir le tiroir des Bonus */}
+                      {/* Bouton pour ouvrir le tiroir des Bonus : vrai bouton pirate 3D */}
                       <button
                         type="button"
                         onClick={() => setActiveBonusPlayerId(player.id)}
-                        className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border active:scale-95 transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-display font-bold text-xs shadow-md border-2 active:scale-95 transition-all ${
                           bonusScore > 0
-                            ? 'gold-gradient text-ink-pure border-gold-dark font-black shadow-xs'
-                            : 'bg-parchment text-ink-light border-parchment-shadow hover:bg-parchment-deep'
+                            ? 'gold-gradient text-ink-pure border-gold-dark ring-2 ring-gold/40 shadow-gold/20'
+                            : 'bg-parchment-light hover:bg-parchment text-ink border-parchment-deep hover:border-gold-deep/60'
                         }`}
+                        title="Configurer les trésors et bonus"
                       >
-                        <Gem className="w-3.5 h-3.5" />
-                        <span>{bonusScore > 0 ? `+${bonusScore}` : 'Bonus'}</span>
+                        <Gem className={`w-4 h-4 shrink-0 ${bonusScore > 0 ? 'text-amber-800' : 'text-gold-deep'}`} />
+                        <span className="font-extrabold whitespace-nowrap">
+                          {bonusScore > 0 ? `+${bonusScore} bonus` : 'Bonus'}
+                        </span>
                       </button>
 
                       {/* Plis actuels */}
