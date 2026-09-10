@@ -160,7 +160,7 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5 pb-16">
+    <div className="max-w-2xl mx-auto space-y-5 pb-6">
       {/* Bandeau distinctif en mode édition */}
       {isEditing && (
         <div className="bg-wax text-parchment-light px-4 py-3 rounded-xl border-2 border-wax-border shadow-md flex items-center justify-between animate-fade-in">
@@ -300,48 +300,52 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             })}
           </div>
 
-          {/* Boutons d'action de l'étape des mises */}
-          {isEditing ? (
-            <div className="flex flex-col sm:flex-row gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
-              <ButtonPirate
-                type="button"
-                onClick={() => setStep('tricks')}
-                variant="ghost"
-                size="md"
-                className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
-              >
-                <span>Passer aux plis</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </ButtonPirate>
+          {/* Action Bar Sticky au bas de l'écran pour l'étape des mises */}
+          <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#f7f2e7]/95 backdrop-blur-sm border-t border-[#d9c29d] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg">
+            {isEditing ? (
+              <div className="flex gap-2.5 w-full max-w-md mx-auto box-border">
+                <ButtonPirate
+                  type="button"
+                  onClick={() => setStep('tricks')}
+                  variant="ghost"
+                  size="md"
+                  className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
+                >
+                  <span>Passer aux plis</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </ButtonPirate>
 
-              <ButtonPirate
-                type="button"
-                onClick={handleFinishRound}
-                disabled={totalTricks !== cardCount}
-                variant="wax"
-                size="lg"
-                className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
-              >
-                <Swords className="w-5 h-5 shrink-0" />
-                <span>
-                  {totalTricks === cardCount
-                    ? 'Enregistrer'
-                    : `Plis requis : ${totalTricks} / ${cardCount}`}
-                </span>
-              </ButtonPirate>
-            </div>
-          ) : (
-            <ButtonPirate
-              type="button"
-              onClick={() => setStep('tricks')}
-              variant="wax"
-              size="lg"
-              className="w-full gap-2 shadow-xl whitespace-nowrap"
-            >
-              <span>Passer aux plis</span>
-              <ArrowRight className="w-5 h-5" />
-            </ButtonPirate>
-          )}
+                <ButtonPirate
+                  type="button"
+                  onClick={handleFinishRound}
+                  disabled={totalTricks !== cardCount}
+                  variant="wax"
+                  size="lg"
+                  className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
+                >
+                  <Swords className="w-5 h-5 shrink-0" />
+                  <span>
+                    {totalTricks === cardCount
+                      ? 'Enregistrer'
+                      : `Plis requis : ${totalTricks} / ${cardCount}`}
+                  </span>
+                </ButtonPirate>
+              </div>
+            ) : (
+              <div className="w-full max-w-md mx-auto">
+                <ButtonPirate
+                  type="button"
+                  onClick={() => setStep('tricks')}
+                  variant="wax"
+                  size="lg"
+                  className="w-full gap-2 shadow-xl whitespace-nowrap"
+                >
+                  <span>Passer aux plis</span>
+                  <ArrowRight className="w-5 h-5 shrink-0" />
+                </ButtonPirate>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -435,36 +439,38 @@ export const RoundEntry: React.FC<RoundEntryProps> = ({
             })}
           </div>
 
-          {/* Boutons d'action avec validation bloquante */}
-          <div className="flex flex-col sm:flex-row gap-2.5 pt-2 w-full max-w-md mx-auto box-border">
-            <ButtonPirate
-              type="button"
-              onClick={() => setStep('bidding')}
-              variant="ghost"
-              size="md"
-              className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
-            >
-              <ArrowLeft className="w-4 h-4 shrink-0" />
-              <span>Modifier mises</span>
-            </ButtonPirate>
+          {/* Action Bar Sticky au bas de l'écran pour l'étape des plis */}
+          <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#f7f2e7]/95 backdrop-blur-sm border-t border-[#d9c29d] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg">
+            <div className="flex gap-2.5 w-full max-w-md mx-auto box-border">
+              <ButtonPirate
+                type="button"
+                onClick={() => setStep('bidding')}
+                variant="ghost"
+                size="md"
+                className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
+              >
+                <ArrowLeft className="w-4 h-4 shrink-0" />
+                <span>Modifier mises</span>
+              </ButtonPirate>
 
-            <ButtonPirate
-              type="button"
-              onClick={handleFinishRound}
-              disabled={totalTricks !== cardCount}
-              variant="wax"
-              size="lg"
-              className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
-            >
-              <Swords className="w-5 h-5 shrink-0" />
-              <span>
-                {totalTricks === cardCount
-                  ? isEditing
-                    ? 'Enregistrer'
-                    : 'Valider la manche'
-                  : `Plis requis : ${totalTricks} / ${cardCount}`}
-              </span>
-            </ButtonPirate>
+              <ButtonPirate
+                type="button"
+                onClick={handleFinishRound}
+                disabled={totalTricks !== cardCount}
+                variant="wax"
+                size="lg"
+                className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-base font-extrabold py-3.5"
+              >
+                <Swords className="w-5 h-5 shrink-0" />
+                <span>
+                  {totalTricks === cardCount
+                    ? isEditing
+                      ? 'Enregistrer'
+                      : 'Valider la manche'
+                    : `Plis requis : ${totalTricks} / ${cardCount}`}
+                </span>
+              </ButtonPirate>
+            </div>
           </div>
         </div>
       )}

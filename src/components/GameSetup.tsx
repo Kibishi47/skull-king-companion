@@ -417,20 +417,21 @@ export const GameSetup: React.FC<GameSetupProps> = ({
         )}
       </ParchmentCard>
 
-      {/* Bouton de démarrage de la partie */}
-      <div className="sticky bottom-4 pt-2">
-
-        <ButtonPirate
-          type="button"
-          onClick={handleStart}
-          disabled={!canStartGame}
-          variant="wax"
-          size="lg"
-          className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Swords className="w-5 h-5 shrink-0" />
-          <span>Démarrer la partie</span>
-        </ButtonPirate>
+      {/* Action Bar Sticky au bas de l'écran pour le démarrage */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#f7f2e7]/95 backdrop-blur-sm border-t border-[#d9c29d] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg">
+        <div className="w-full max-w-md mx-auto">
+          <ButtonPirate
+            type="button"
+            onClick={handleStart}
+            disabled={!canStartGame}
+            variant="wax"
+            size="lg"
+            className="w-full shadow-xl gap-2 tracking-wider whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-extrabold py-3.5"
+          >
+            <Swords className="w-5 h-5 shrink-0" />
+            <span>Démarrer la partie</span>
+          </ButtonPirate>
+        </div>
       </div>
     </div>
   );

@@ -74,8 +74,8 @@ export function App() {
         </div>
       </header>
 
-      {/* Corps principal avec Safe Area */}
-      <main className="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+      {/* Corps principal avec Safe Area et marge pour l'action bar sticky */}
+      <main className="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 pb-28">
         {!activeGame && (
           <GameSetup
             onStartGame={startNewGame}

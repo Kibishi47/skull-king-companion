@@ -107,40 +107,42 @@ export const RoundRecap: React.FC<RoundRecapProps> = ({
         })}
       </div>
 
-      {/* Actions et Raccourcis */}
-      <div className="space-y-3 pt-2 w-full max-w-md mx-auto box-border">
-        <ButtonPirate
-          type="button"
-          onClick={onOpenScoreboard}
-          variant="wood"
-          size="md"
-          className="w-full gap-2 shadow-md whitespace-nowrap text-xs sm:text-sm py-3"
-        >
-          <Trophy className="w-4 h-4 text-gold shrink-0" />
-          <span>Tableau des scores</span>
-        </ButtonPirate>
+      {/* Actions et Raccourcis Sticky au bas de l'écran */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#f7f2e7]/95 backdrop-blur-sm border-t border-[#d9c29d] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-lg">
+        <div className="space-y-2 w-full max-w-md mx-auto box-border">
+          <div className="flex gap-2.5 w-full box-border">
+            <ButtonPirate
+              type="button"
+              onClick={onEditRound}
+              variant="ghost"
+              size="md"
+              className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
+            >
+              <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
+              <span>Modifier</span>
+            </ButtonPirate>
 
-        <div className="flex flex-col sm:flex-row gap-2.5 w-full box-border">
+            <ButtonPirate
+              type="button"
+              onClick={onProceed}
+              variant="wax"
+              size="lg"
+              className="flex-2 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
+            >
+              <span>Manche suivante</span>
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            </ButtonPirate>
+          </div>
+
           <ButtonPirate
             type="button"
-            onClick={onEditRound}
-            variant="ghost"
-            size="md"
-            className="flex-1 min-w-0 gap-1.5 whitespace-nowrap text-xs sm:text-sm py-3"
+            onClick={onOpenScoreboard}
+            variant="wood"
+            size="sm"
+            className="w-full gap-2 shadow-sm whitespace-nowrap text-xs py-2"
           >
-            <Pencil className="w-4 h-4 shrink-0 text-gold-deep" />
-            <span>Modifier la manche</span>
-          </ButtonPirate>
-
-          <ButtonPirate
-            type="button"
-            onClick={onProceed}
-            variant="wax"
-            size="lg"
-            className="flex-1 min-w-0 gap-2 shadow-xl whitespace-nowrap text-sm sm:text-base font-extrabold py-3.5"
-          >
-            <span>Manche suivante</span>
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <Trophy className="w-3.5 h-3.5 text-gold shrink-0" />
+            <span>Tableau des scores</span>
           </ButtonPirate>
         </div>
       </div>
