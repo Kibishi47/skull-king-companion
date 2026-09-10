@@ -30,11 +30,11 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-fade-in">
       <div
-        className="w-full max-w-lg bg-parchment-light rounded-t-2xl sm:rounded-2xl border-t-4 sm:border-2 border-gold-dark shadow-2xl p-5 max-h-[85vh] overflow-y-auto space-y-4"
+        className="w-full max-w-lg bg-parchment-light rounded-t-2xl sm:rounded-2xl border-t-4 sm:border-2 border-gold-dark shadow-2xl flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Drawer */}
-        <div className="flex items-start justify-between gap-3 border-b border-parchment-shadow pb-3">
+        {/* Header Drawer Fixe */}
+        <div className="flex items-start justify-between gap-3 border-b border-parchment-shadow p-4 sm:p-5 bg-parchment shrink-0 rounded-t-2xl">
           <div className="flex items-start gap-2.5 min-w-0">
             <Gem className="w-6 h-6 text-gold-deep shrink-0 mt-0.5" />
             <div className="min-w-0">
@@ -49,15 +49,15 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-ink-faded hover:text-ink hover:bg-parchment transition-colors shrink-0"
+            className="p-1 rounded-lg text-ink-faded hover:text-ink hover:bg-parchment-deep transition-colors shrink-0"
             aria-label="Fermer"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Lignes de bonus interactives */}
-        <div className="space-y-3">
+        {/* Corps défilable avec les bonus */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
           {/* 14 de couleur */}
           <div className="flex items-center justify-between gap-3 bg-parchment p-3 rounded-lg border border-parchment-deep">
             <div className="min-w-0">
@@ -271,12 +271,12 @@ export const BonusDrawer: React.FC<BonusDrawerProps> = ({
           </div>
         </div>
 
-        {/* Bouton Fermer */}
-        <div className="pt-2">
+        {/* Pied de page Sticky avec le bouton de validation */}
+        <div className="border-t border-parchment-shadow p-3.5 sm:p-4 bg-parchment/95 backdrop-blur-sm shrink-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <button
             type="button"
             onClick={onClose}
-            className="w-full gold-gradient py-3 rounded-xl font-display font-bold text-ink-pure text-base shadow-md hover:brightness-105"
+            className="w-full gold-gradient py-3.5 rounded-xl font-display font-bold text-ink-pure text-base shadow-md active:scale-95 hover:brightness-105 transition-all"
           >
             Valider les Trésors
           </button>

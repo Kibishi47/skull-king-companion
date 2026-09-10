@@ -169,7 +169,7 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                   onChange={(e) => handlePlayerInputChange(idx, e.target.value)}
                   placeholder={`Prénom du joueur ${idx + 1}`}
                   maxLength={20}
-                  className={`flex-1 bg-white/90 border-2 rounded-lg px-3 py-2 text-ink text-base focus:outline-none transition-colors ${
+                  className={`flex-1 min-w-0 bg-white/90 border-2 rounded-lg px-2.5 py-2 text-ink text-sm sm:text-base focus:outline-none transition-colors ${
                     isBlank && hasStartedFilling
                       ? 'border-wax ring-1 ring-wax/40 focus:border-wax'
                       : 'border-parchment-deep focus:border-gold-deep'
@@ -177,39 +177,42 @@ export const GameSetup: React.FC<GameSetupProps> = ({
                 />
 
                 <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleMovePlayerUp(idx)}
-                    disabled={idx === 0}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-parchment/60 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
-                    aria-label={`Monter le joueur ${idx + 1}`}
-                    title="Monter"
-                  >
-                    <ChevronUp className="w-5 h-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleMovePlayerDown(idx)}
-                    disabled={idx === playerInputs.length - 1}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-parchment/60 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
-                    aria-label={`Descendre le joueur ${idx + 1}`}
-                    title="Descendre"
-                  >
-                    <ChevronDown className="w-5 h-5" />
-                  </button>
-                </div>
+                  {/* Flèches monter/descendre compactes & tactiles */}
+                  <div className="flex flex-col gap-0.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleMovePlayerUp(idx)}
+                      disabled={idx === 0}
+                      className="w-9 h-5 flex items-center justify-center rounded bg-parchment/70 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
+                      aria-label={`Monter le joueur ${idx + 1}`}
+                      title="Monter"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMovePlayerDown(idx)}
+                      disabled={idx === playerInputs.length - 1}
+                      className="w-9 h-5 flex items-center justify-center rounded bg-parchment/70 hover:bg-parchment border border-parchment-shadow text-ink-light hover:text-ink disabled:opacity-20 active:scale-95 transition-all"
+                      aria-label={`Descendre le joueur ${idx + 1}`}
+                      title="Descendre"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                {playerInputs.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemovePlayerField(idx)}
-                    className="w-10 h-10 flex items-center justify-center text-wax hover:text-wax-dark bg-wax/10 hover:bg-wax/20 rounded-lg active:scale-95 transition-all shrink-0"
-                    aria-label={`Supprimer le joueur ${idx + 1}`}
-                    title="Supprimer le joueur"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+                  {playerInputs.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePlayerField(idx)}
+                      className="w-9 h-11 flex items-center justify-center text-wax hover:text-wax-dark bg-wax/10 hover:bg-wax/20 rounded-lg active:scale-95 transition-all shrink-0"
+                      aria-label={`Supprimer le joueur ${idx + 1}`}
+                      title="Supprimer le joueur"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}
